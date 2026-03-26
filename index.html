@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta 3D³ Tic-Tac-Toe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --panel: #16161f;
+  --border: #252535;
+  --border2: #3a3a55;
+  --x: #e8ff57;
+  --o: #ff6b6b;
+  --x-dim: #e8ff5744;
+  --o-dim: #ff6b6b44;
+  --active: #5566ff;
+  --active-glow: #5566ff55;
+  --text: #6677aa;
+  --text-hi: #ccd0ee;
+  --won-x-bg: #e8ff5712;
+  --won-o-bg: #ff6b6b12;
+  --cell-size: 20px;
+  /* Local layer tints */
+  --lz0: #1a2a1a;
+  --lz0-border: #2a4a2a;
+  --lz0-label: #4caf7d;
+  --lz1: #1a1a2e;
+  --lz1-border: #2a2a50;
+  --lz1-label: #6677ff;
+  --lz2: #2e1a1a;
+  --lz2-border: #501a1a;
+  --lz2-label: #ff7777;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text-hi);
+  font-family: 'Syne Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+/* ── HEADER ── */
+header {
+  width: 100%;
+  padding: 22px 24px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(20px, 4vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-hi);
+}
+h1 span.x-col { color: var(--x); }
+h1 span.o-col { color: var(--o); }
+.sub { font-size: 10px; letter-spacing: 0.3em; color: var(--text); text-transform: uppercase; }
+
+/* ── STATUS BAR ── */
+#statusbar {
+  display: flex; align-items: center; gap: 20px;
+  padding: 8px 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#turn-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.scores { display: flex; gap: 16px; align-items: center; }
+.sc { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.sc-num { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
+.sc-x { color: var(--x); }
+.sc-o { color: var(--o); }
+#meta-progress {
+  font-size: 10px; color: var(--text);
+  display: flex; gap: 4px; align-items: center;
+}
+.prog-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+.prog-dot.x { background: var(--x); }
+.prog-dot.o { background: var(--o); }
+
+/* ── TOOLBAR ── */
+#toolbar {
+  display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center;
+}
+.tbtn {
+  font-family: 'Syne Mono', monospace; font-size: 10px;
+  padding: 6px 14px; border-radius: 4px;
+  background: var(--panel); border: 1px solid var(--border);
+  color: var(--text); cursor: pointer; letter-spacing: 0.1em;
+  transition: all 0.15s;
+}
+.tbtn:hover { border-color: var(--active); color: var(--text-hi); }
+.tbtn.on { border-color: var(--active); color: var(--active); background: #5566ff11; }
+
+/* ── VIEW MODES ── */
+#view-container { width: 100%; display: flex; justify-content: center; }
+
+/* === LAYERED VIEW === */
+#view-layered {
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+  padding: 16px;
+}
+.layer-section { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.layer-tag {
+  font-size: 9px; letter-spacing: 0.3em; color: var(--text);
+  text-transform: uppercase; opacity: 0.7;
+}
+.layer-grid {
+  display: grid; grid-template-columns: repeat(3, auto); gap: 6px;
+}
+
+/* === FLAT VIEW === */
+#view-flat {
+  display: flex; flex-direction: row; gap: 6px; padding: 16px;
+  align-items: flex-start; flex-wrap: wrap; justify-content: center;
+}
+.flat-meta-group {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 2px solid;
+}
+.flat-meta-group[data-mz="0"] { border-color: var(--lz0-border); background: #1a2a1a22; }
+.flat-meta-group[data-mz="1"] { border-color: var(--lz1-border); background: #1a1a2e22; }
+.flat-meta-group[data-mz="2"] { border-color: var(--lz2-border); background: #2e1a1a22; }
+.flat-group-label {
+  font-size: 9px; letter-spacing: 0.25em; font-weight: 700;
+  text-transform: uppercase;
+}
+.flat-meta-group[data-mz="0"] .flat-group-label { color: var(--lz0-label); }
+.flat-meta-group[data-mz="1"] .flat-group-label { color: var(--lz1-label); }
+.flat-meta-group[data-mz="2"] .flat-group-label { color: var(--lz2-label); }
+.flat-boards-grid {
+  display: grid; grid-template-columns: repeat(3, auto); gap: 5px;
+}
+
+/* === NAVIGATOR VIEW === */
+#view-nav {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  padding: 16px; width: 100%;
+}
+#nav-meta {
+  display: grid; grid-template-columns: repeat(3, auto);
+  gap: 4px; padding: 10px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+}
+.nav-cell {
+  width: 44px; height: 44px;
+  border: 1.5px solid var(--border2);
+  border-radius: 4px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800;
+  transition: all 0.15s; background: var(--surface); position: relative;
+  flex-direction: column; gap: 2px;
+}
+.nav-cell:hover { border-color: var(--active); }
+.nav-cell.nav-selected { border-color: var(--active); box-shadow: 0 0 12px var(--active-glow); }
+.nav-cell.nav-won-x { background: var(--won-x-bg); border-color: var(--x); color: var(--x); }
+.nav-cell.nav-won-o { background: var(--won-o-bg); border-color: var(--o); color: var(--o); }
+.nav-cell.nav-active-board { border-color: var(--active); }
+.nav-layer-label {
+  font-size: 8px; letter-spacing: 0.2em; color: var(--text); opacity: 0.6;
+  position: absolute; bottom: 2px; right: 4px;
+}
+#nav-layer-tabs { display: flex; gap: 6px; }
+.ltab {
+  font-family: 'Syne Mono', monospace; font-size: 10px;
+  padding: 5px 14px; border-radius: 4px;
+  background: var(--panel); border: 1px solid var(--border);
+  color: var(--text); cursor: pointer; letter-spacing: 0.15em;
+}
+.ltab.on { border-color: var(--active); color: var(--active); }
+#nav-game-area { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+#nav-game-label {
+  font-size: 10px; letter-spacing: 0.2em; color: var(--text);
+}
+
+/* ── LOCAL 3×3×3 BOARD ── */
+.local-board-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 4px; border-radius: 5px;
+  border: 2px solid var(--border2);
+  background: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.25s;
+  position: relative; cursor: default;
+}
+.local-board-wrap.active-meta {
+  border-color: var(--active);
+  box-shadow: 0 0 14px var(--active-glow);
+}
+.local-board-wrap.won-x { background: var(--won-x-bg); border-color: var(--x); }
+.local-board-wrap.won-o { background: var(--won-o-bg); border-color: var(--o); }
+.local-board-wrap.drawn  { background: #ffffff06; border-color: #333; }
+
+.lb-layer { display: grid; grid-template-columns: repeat(3, var(--cell-size)); gap: 1px; border-radius: 3px; padding: 2px; }
+.lb-layer[data-z="0"] { background: var(--lz0); outline: 1px solid var(--lz0-border); }
+.lb-layer[data-z="1"] { background: var(--lz1); outline: 1px solid var(--lz1-border); }
+.lb-layer[data-z="2"] { background: var(--lz2); outline: 1px solid var(--lz2-border); }
+.lb-layer + .lb-layer { margin-top: 3px; }
+
+.lc {
+  width: var(--cell-size); height: var(--cell-size);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; font-family: 'Syne', sans-serif;
+  cursor: pointer; border-radius: 2px;
+  transition: background 0.1s;
+  color: var(--text);
+  border: 1px solid transparent;
+}
+.lc:hover:not(.lc-taken):not(.lb-done) {
+  background: #5566ff22;
+  border-color: #5566ff44;
+  color: #8899ff;
+}
+.lc.lc-x { color: var(--x); cursor: default; }
+.lc.lc-o { color: var(--o); cursor: default; }
+.lc.lc-taken { cursor: default; }
+
+/* Target preview highlight */
+.local-board-wrap.target-preview {
+  border-color: #ffcc00 !important;
+  box-shadow: 0 0 18px #ffcc0066, inset 0 0 10px #ffcc0018 !important;
+  background: #ffcc0010 !important;
+  transition: border-color 0.1s, box-shadow 0.1s, background 0.1s;
+}
+.local-board-wrap.target-preview-any {
+  border-color: #ffcc0055 !important;
+  box-shadow: 0 0 8px #ffcc0033 !important;
+}
+
+/* Won overlay on local board */
+.lb-won-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  border-radius: 4px; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s;
+  z-index: 3;
+}
+.lb-won-overlay.show { opacity: 1; }
+.lb-won-overlay.x { color: var(--x); text-shadow: 0 0 16px var(--x); background: #e8ff5708; }
+.lb-won-overlay.o { color: var(--o); text-shadow: 0 0 16px var(--o); background: #ff6b6b08; }
+.lb-won-overlay.draw { color: var(--text); font-size: 14px; }
+
+/* ── WIN MODAL ── */
+#win-modal {
+  position: fixed; inset: 0;
+  background: rgba(10,10,15,0.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s; backdrop-filter: blur(6px);
+}
+#win-modal.show { opacity: 1; pointer-events: all; }
+.win-box {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 48px 60px; text-align: center;
+  box-shadow: 0 0 80px rgba(85,102,255,0.15);
+}
+.win-box h2 {
+  font-family: 'Syne', sans-serif; font-size: clamp(28px, 6vw, 52px);
+  font-weight: 800; margin-bottom: 8px;
+}
+.win-box h2.x { color: var(--x); }
+.win-box h2.o { color: var(--o); }
+.win-box h2.draw { color: var(--text-hi); }
+.win-box p { color: var(--text); font-size: 12px; margin-bottom: 28px; letter-spacing: 0.1em; }
+.win-box button {
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  padding: 12px 36px; border-radius: 5px; letter-spacing: 0.15em;
+  border: 1.5px solid var(--active); background: transparent; color: var(--text-hi);
+  cursor: pointer; transition: all 0.2s;
+}
+.win-box button:hover { box-shadow: 0 0 20px var(--active-glow); }
+
+/* ── CONFIRM BAR ── */
+#confirm-bar {
+  display: none;
+  position: sticky; bottom: 0; z-index: 50;
+  width: 100%; padding: 10px 16px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  justify-content: center; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+#confirm-bar.show { display: flex; }
+#confirm-bar .preview-label {
+  font-size: 11px; color: var(--text); letter-spacing: 0.1em;
+}
+#confirm-bar .preview-label strong { color: var(--text-hi); }
+#btn-confirm {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+  padding: 9px 28px; border-radius: 5px; letter-spacing: 0.12em;
+  border: 1.5px solid var(--x); background: transparent;
+  color: var(--x); cursor: pointer; transition: all 0.15s;
+}
+#btn-confirm.o-turn { border-color: var(--o); color: var(--o); }
+#btn-confirm:hover { box-shadow: 0 0 16px #e8ff5766; }
+#btn-confirm.o-turn:hover { box-shadow: 0 0 16px #ff6b6b66; }
+#btn-cancel {
+  font-family: 'Syne Mono', monospace; font-size: 10px;
+  padding: 8px 18px; border-radius: 5px; letter-spacing: 0.1em;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text); cursor: pointer; transition: all 0.15s;
+}
+#btn-cancel:hover { border-color: var(--text); color: var(--text-hi); }
+
+/* Preview ghost cell */
+.lc.lc-preview {
+  opacity: 0.5;
+  background: #ffffff10;
+  border-color: #ffffff44 !important;
+}
+.lc.lc-preview.lc-preview-x { color: var(--x); }
+.lc.lc-preview.lc-preview-o { color: var(--o); }
+#rules-box {
+  display: none; max-width: 680px; width: 90%;
+  padding: 18px 24px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 6px;
+  font-size: 11px; color: var(--text); line-height: 1.9;
+  margin-bottom: 14px;
+}
+#rules-box.show { display: block; }
+#rules-box h3 { font-family: 'Syne', sans-serif; font-size: 12px; color: var(--text-hi); margin-bottom: 8px; letter-spacing: 0.1em; }
+#rules-box strong { color: var(--text-hi); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>META <span class="x-col">3</span>D<sup style="font-size:0.5em;vertical-align:super;">3</sup> <span class="o-col">TTT</span></h1>
+  <div class="sub">27 local 3×3×3 games · 3×3×3 meta-grid · win the cube</div>
+</header>
+
+<div id="statusbar">
+  <div id="turn-label">X'S TURN</div>
+  <div class="scores">
+    <div class="sc"><span class="sc-x">X</span><span class="sc-num sc-x" id="sc-x">0</span></div>
+    <div class="sc"><span class="sc-o">O</span><span class="sc-num sc-o" id="sc-o">0</span></div>
+  </div>
+  <div id="meta-progress"></div>
+  <div style="display:flex;gap:8px;align-items:center;font-size:9px;letter-spacing:.1em;">
+    <span style="color:var(--lz0-label)">▪ Z=0</span>
+    <span style="color:var(--lz1-label)">▪ Z=1</span>
+    <span style="color:var(--lz2-label)">▪ Z=2</span>
+  </div>
+</div>
+
+<div id="toolbar">
+  <button class="tbtn" id="btn-layered" onclick="setView('layered')">LAYERED</button>
+  <button class="tbtn on" id="btn-flat" onclick="setView('flat')">FLAT GRID</button>
+  <button class="tbtn" id="btn-nav" onclick="setView('nav')">NAVIGATOR</button>
+  <button class="tbtn" onclick="resetGame()">RESET</button>
+  <button class="tbtn" id="btn-rules" onclick="toggleRules()">RULES</button>
+</div>
+
+<div id="rules-box">
+  <h3>HOW TO PLAY</h3>
+  <strong>The Meta-Grid:</strong> 27 positions arranged as a 3×3×3 cube. Each position holds a <strong>local 3×3×3 tic-tac-toe game</strong> (3 layers of 3×3 = 27 cells each).<br>
+  <strong>Local game:</strong> Each local game is itself 3D — 3 layers stacked. Get 3 in a row in any row, column, pillar, or diagonal within that local cube to claim it.<br>
+  <strong>Routing:</strong> Your local cell position sends your opponent to the matching meta-position. If that meta-position is already claimed, they play anywhere free.<br>
+  <strong>Win condition:</strong> Claim 3 meta-positions in a 3D line (row, column, pillar, or space diagonal) to WIN THE CUBE.<br>
+  <strong>Views:</strong> Layered = 3 meta-layers stacked. Flat = all 27 in a 9×3 grid. Navigator = click a meta-position to zoom in.
+</div>
+
+<div id="view-container">
+  <div id="view-layered" style="display:none"></div>
+  <div id="view-flat"></div>
+  <div id="view-nav" style="display:none">
+    <div id="nav-layer-tabs">
+      <button class="ltab on" onclick="setNavLayer(0)">LAYER Z=0</button>
+      <button class="ltab" onclick="setNavLayer(1)">LAYER Z=1</button>
+      <button class="ltab" onclick="setNavLayer(2)">LAYER Z=2</button>
+    </div>
+    <div id="nav-meta"></div>
+    <div id="nav-game-area">
+      <div id="nav-game-label">SELECT A POSITION ABOVE</div>
+      <div id="nav-local-board"></div>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-bar">
+  <span class="preview-label" id="confirm-label">Place <strong>X</strong> here?</span>
+  <button id="btn-confirm" onclick="commitPreview()">CONFIRM</button>
+  <button id="btn-cancel" onclick="cancelPreview()">CANCEL</button>
+</div>
+
+<div id="win-modal">
+  <div class="win-box">
+    <h2 id="win-title">X WINS!</h2>
+    <p id="win-sub">3 meta-positions in a 3D line</p>
+    <button onclick="resetGame()">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONSTANTS & WIN LINES
+// ═══════════════════════════════════════════════════════
+
+// Local 3×3×3: index = z*9 + y*3 + x  (z=layer 0-2, y=row, x=col)
+function li(z,y,x){ return z*9+y*3+x; }
+
+// All win lines in a 3×3×3 cube (49 lines total)
+function buildWins3d(){
+  const w = [];
+  // rows (x varies)
+  for(let z=0;z<3;z++) for(let y=0;y<3;y++) w.push([li(z,y,0),li(z,y,1),li(z,y,2)]);
+  // cols (y varies)
+  for(let z=0;z<3;z++) for(let x=0;x<3;x++) w.push([li(z,0,x),li(z,1,x),li(z,2,x)]);
+  // pillars (z varies)
+  for(let y=0;y<3;y++) for(let x=0;x<3;x++) w.push([li(0,y,x),li(1,y,x),li(2,y,x)]);
+  // face diagonals (z fixed)
+  for(let z=0;z<3;z++){
+    w.push([li(z,0,0),li(z,1,1),li(z,2,2)]);
+    w.push([li(z,0,2),li(z,1,1),li(z,2,0)]);
+  }
+  // face diagonals (y fixed)
+  for(let y=0;y<3;y++){
+    w.push([li(0,y,0),li(1,y,1),li(2,y,2)]);
+    w.push([li(0,y,2),li(1,y,1),li(2,y,0)]);
+  }
+  // face diagonals (x fixed)
+  for(let x=0;x<3;x++){
+    w.push([li(0,0,x),li(1,1,x),li(2,2,x)]);
+    w.push([li(0,2,x),li(1,1,x),li(2,0,x)]);
+  }
+  // 4 space diagonals
+  w.push([li(0,0,0),li(1,1,1),li(2,2,2)]);
+  w.push([li(0,0,2),li(1,1,1),li(2,2,0)]);
+  w.push([li(0,2,0),li(1,1,1),li(2,0,2)]);
+  w.push([li(0,2,2),li(1,1,1),li(2,0,0)]);
+  return w;
+}
+const WINS3D = buildWins3d(); // used for both local & meta
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+
+// localCells[metaIdx][cellIdx] = null/'x'/'o'
+let localCells, localWinners, metaWinners;
+let currentPlayer, activeMetaBoards, gameOver, scores, navLayer, navSelected;
+
+function initState(){
+  localCells   = Array.from({length:27}, ()=>Array(27).fill(null));
+  localWinners = Array(27).fill(null);   // null/'x'/'o'/'draw' per local board
+  metaWinners  = Array(27).fill(null);   // same, for meta
+  currentPlayer = 'x';
+  activeMetaBoards = null; // null = any free
+  gameOver = false;
+  navLayer = 0;
+  navSelected = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════════════
+
+function isMetaActive(mi){
+  if(metaWinners[mi]) return false;
+  if(activeMetaBoards === null) return true;
+  return activeMetaBoards.includes(mi);
+}
+
+function getFreeMetaBoards(){
+  return [...Array(27).keys()].filter(i=>!metaWinners[i]);
+}
+
+function checkWin3d(arr){
+  for(const [a,b,c] of WINS3D){
+    if(arr[a] && arr[a]===arr[b] && arr[a]===arr[c]) return arr[a];
+  }
+  if(arr.every(v=>v)) return 'draw';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════
+// PREVIEW STATE
+// ═══════════════════════════════════════════════════════
+let pendingMeta = null, pendingCell = null; // pending preview move
+
+function handleCellClick(metaIdx, cellIdx){
+  if(gameOver) return;
+  if(!isMetaActive(metaIdx)) return;
+  if(localCells[metaIdx][cellIdx]) return;
+  if(localWinners[metaIdx]) return;
+
+  // If clicking the same cell that's already previewed → commit
+  if(pendingMeta === metaIdx && pendingCell === cellIdx){
+    commitPreview(); return;
+  }
+
+  // Set new preview
+  cancelPreview(true); // silent cancel (no re-render)
+  pendingMeta = metaIdx;
+  pendingCell = cellIdx;
+  renderAll();
+  showConfirmBar();
+  highlightTarget(cellIdx);
+}
+
+function showConfirmBar(){
+  const bar = document.getElementById('confirm-bar');
+  const lbl = document.getElementById('confirm-label');
+  const btn = document.getElementById('btn-confirm');
+  bar.classList.add('show');
+  lbl.innerHTML = `Place <strong>${currentPlayer.toUpperCase()}</strong> — confirm?`;
+  btn.className = currentPlayer === 'o' ? 'o-turn' : '';
+  btn.id = 'btn-confirm';
+}
+
+function commitPreview(){
+  if(pendingMeta === null) return;
+  const metaIdx = pendingMeta, cellIdx = pendingCell;
+  pendingMeta = null; pendingCell = null;
+  document.getElementById('confirm-bar').classList.remove('show');
+  clearTargetHighlight();
+
+  localCells[metaIdx][cellIdx] = currentPlayer;
+
+  const lw = checkWin3d(localCells[metaIdx]);
+  if(lw){
+    localWinners[metaIdx] = lw;
+    metaWinners[metaIdx] = lw;
+    const gw = checkWin3d(metaWinners);
+    if(gw){ renderAll(); endGame(gw); return; }
+  }
+
+  const nextMeta = cellIdx;
+  let candidates;
+  if(!metaWinners[nextMeta]){
+    candidates = [nextMeta];
+  } else {
+    candidates = getFreeMetaBoards();
+  }
+  activeMetaBoards = candidates.length > 0 ? candidates : null;
+
+  currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
+  renderAll();
+  updateStatus();
+}
+
+function cancelPreview(silent){
+  pendingMeta = null; pendingCell = null;
+  document.getElementById('confirm-bar').classList.remove('show');
+  clearTargetHighlight();
+  if(!silent) renderAll();
+}
+
+function endGame(winner){
+  gameOver = true;
+  if(winner !== 'draw') scores[winner]++;
+  document.getElementById('sc-x').textContent = scores.x;
+  document.getElementById('sc-o').textContent = scores.o;
+  const modal = document.getElementById('win-modal');
+  const title = document.getElementById('win-title');
+  const sub   = document.getElementById('win-sub');
+  modal.classList.add('show');
+  if(winner === 'draw'){
+    title.className = 'draw'; title.textContent = 'DRAW!';
+    sub.textContent = 'The meta-cube is contested';
+  } else {
+    title.className = winner;
+    title.textContent = winner.toUpperCase() + ' WINS THE CUBE!';
+    sub.textContent = '3 meta-positions in a 3D line';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+
+let currentView = 'flat';
+
+function buildLocalBoard(metaIdx, compact){
+  const sz = compact ? 16 : 20;
+  const wrap = document.createElement('div');
+  wrap.className = 'local-board-wrap';
+  wrap.dataset.meta = metaIdx;
+  wrap.style.setProperty('--cell-size', sz+'px');
+
+  const active = isMetaActive(metaIdx);
+  const mw = metaWinners[metaIdx];
+  if(active) wrap.classList.add('active-meta');
+  if(mw === 'x') wrap.classList.add('won-x');
+  else if(mw === 'o') wrap.classList.add('won-o');
+  else if(mw === 'draw') wrap.classList.add('drawn');
+
+  // 3 local layers
+  for(let z=0;z<3;z++){
+    const layerWrap = document.createElement('div');
+    layerWrap.style.cssText = 'display:flex;flex-direction:column;gap:1px;';
+
+    // Tiny colored layer label
+    const zColors = ['var(--lz0-label)','var(--lz1-label)','var(--lz2-label)'];
+    const zLbl = document.createElement('div');
+    zLbl.style.cssText = `font-size:7px;letter-spacing:.15em;color:${zColors[z]};opacity:.8;padding:0 2px;line-height:1.2;`;
+    zLbl.textContent = `Z=${z}`;
+    layerWrap.appendChild(zLbl);
+
+    const row = document.createElement('div');
+    row.className = 'lb-layer';
+    row.dataset.z = z;
+    for(let i=0;i<9;i++){
+      const cellIdx = z*9+i;
+      const cell = document.createElement('div');
+      cell.className = 'lc';
+      const v = localCells[metaIdx][cellIdx];
+      const isPending = (pendingMeta === metaIdx && pendingCell === cellIdx);
+      if(v){
+        cell.classList.add('lc-'+v, 'lc-taken');
+        cell.textContent = v.toUpperCase();
+      } else if(isPending){
+        cell.classList.add('lc-preview', 'lc-preview-'+currentPlayer, 'lc-taken');
+        cell.textContent = currentPlayer.toUpperCase();
+      } else if(mw){
+        cell.classList.add('lc-taken');
+        cell.style.opacity='0.15';
+      } else if(!active){
+        cell.style.cursor='default';
+      }
+      if(!v && !mw && !isPending){
+        cell.addEventListener('click', ()=>handleCellClick(metaIdx, cellIdx));
+        cell.addEventListener('mouseenter', ()=>highlightTarget(cellIdx));
+        cell.addEventListener('mouseleave', ()=>{ if(pendingMeta===null) clearTargetHighlight(); });
+      }
+      if(isPending){
+        cell.addEventListener('click', ()=>commitPreview());
+      }
+      row.appendChild(cell);
+    }
+    layerWrap.appendChild(row);
+    wrap.appendChild(layerWrap);
+  }
+
+  // Won overlay
+  const ov = document.createElement('div');
+  ov.className = 'lb-won-overlay';
+  if(mw){
+    ov.classList.add('show');
+    if(mw === 'draw'){ ov.classList.add('draw'); ov.textContent = '–'; }
+    else { ov.classList.add(mw); ov.textContent = mw.toUpperCase(); }
+  }
+  wrap.appendChild(ov);
+  return wrap;
+}
+
+function renderLayered(){
+  const c = document.getElementById('view-layered');
+  c.innerHTML = '';
+  for(let z=0;z<3;z++){
+    const sec = document.createElement('div');
+    sec.className = 'layer-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'layer-tag';
+    lbl.textContent = `META LAYER Z=${z}`;
+    sec.appendChild(lbl);
+    const grid = document.createElement('div');
+    grid.className = 'layer-grid';
+    for(let i=0;i<9;i++){
+      const mi = z*9+i;
+      grid.appendChild(buildLocalBoard(mi, false));
+    }
+    sec.appendChild(grid);
+    c.appendChild(sec);
+  }
+}
+
+function renderFlat(){
+  const c = document.getElementById('view-flat');
+  c.innerHTML = '';
+  const zNames = ['META Z=0','META Z=1','META Z=2'];
+  for(let z=0;z<3;z++){
+    const group = document.createElement('div');
+    group.className = 'flat-meta-group';
+    group.dataset.mz = z;
+    const lbl = document.createElement('div');
+    lbl.className = 'flat-group-label';
+    lbl.textContent = zNames[z];
+    group.appendChild(lbl);
+    const grid = document.createElement('div');
+    grid.className = 'flat-boards-grid';
+    for(let i=0;i<9;i++){
+      grid.appendChild(buildLocalBoard(z*9+i, true));
+    }
+    group.appendChild(grid);
+    c.appendChild(group);
+  }
+}
+
+function renderNav(){
+  // Layer tabs
+  document.querySelectorAll('.ltab').forEach((el,i)=>el.classList.toggle('on', i===navLayer));
+
+  // Meta grid (3×3 for current layer)
+  const metaEl = document.getElementById('nav-meta');
+  metaEl.innerHTML = '';
+  for(let i=0;i<9;i++){
+    const mi = navLayer*9+i;
+    const nc = document.createElement('div');
+    nc.className = 'nav-cell';
+    const mw = metaWinners[mi];
+    if(mw && mw !== 'draw'){ nc.classList.add('nav-won-'+mw); nc.textContent = mw.toUpperCase(); }
+    else if(mw === 'draw'){ nc.textContent = '–'; nc.style.color='var(--text)'; }
+    else { nc.textContent = ''; }
+    if(isMetaActive(mi)) nc.classList.add('nav-active-board');
+    if(navSelected === mi) nc.classList.add('nav-selected');
+    // small layer label
+    const ll = document.createElement('span');
+    ll.className = 'nav-layer-label';
+    ll.textContent = `${i}`;
+    nc.appendChild(ll);
+    nc.addEventListener('click', ()=>{ navSelected = mi; renderNav(); });
+    metaEl.appendChild(nc);
+  }
+
+  // Local board display
+  const area = document.getElementById('nav-local-board');
+  const lbl  = document.getElementById('nav-game-label');
+  area.innerHTML = '';
+  if(navSelected !== null){
+    const z = Math.floor(navSelected/9), rem = navSelected%9, y = Math.floor(rem/3), x = rem%3;
+    lbl.textContent = `LOCAL BOARD  Z=${z}  Y=${y}  X=${x}`;
+    // Build larger version
+    const wrap = buildLocalBoardLarge(navSelected);
+    area.appendChild(wrap);
+  } else {
+    lbl.textContent = 'SELECT A META-POSITION ABOVE';
+  }
+}
+
+function buildLocalBoardLarge(metaIdx){
+  const sz = 32;
+  const wrap = document.createElement('div');
+  wrap.className = 'local-board-wrap';
+  wrap.style.setProperty('--cell-size', sz+'px');
+  wrap.style.padding = '8px';
+  wrap.style.gap = '4px';
+
+  const active = isMetaActive(metaIdx);
+  const mw = metaWinners[metaIdx];
+  if(active) wrap.classList.add('active-meta');
+  if(mw === 'x') wrap.classList.add('won-x');
+  else if(mw === 'o') wrap.classList.add('won-o');
+  else if(mw === 'draw') wrap.classList.add('drawn');
+
+  for(let z=0;z<3;z++){
+    const zColors = ['var(--lz0-label)','var(--lz1-label)','var(--lz2-label)'];
+    const layerWrap = document.createElement('div');
+    layerWrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+
+    const lbl2 = document.createElement('div');
+    lbl2.style.cssText = `font-size:9px;letter-spacing:.2em;color:${zColors[z]};font-weight:700;padding:0 3px;`;
+    lbl2.textContent = `LAYER Z=${z}`;
+    layerWrap.appendChild(lbl2);
+
+    const row = document.createElement('div');
+    row.className = 'lb-layer';
+    row.dataset.z = z;
+    row.style.gap = '2px';
+    for(let i=0;i<9;i++){
+      const cellIdx = z*9+i;
+      const cell = document.createElement('div');
+      cell.className = 'lc';
+      cell.style.fontSize = '14px';
+      const v = localCells[metaIdx][cellIdx];
+      const isPending = (pendingMeta === metaIdx && pendingCell === cellIdx);
+      if(v){
+        cell.classList.add('lc-'+v,'lc-taken');
+        cell.textContent = v.toUpperCase();
+      } else if(isPending){
+        cell.classList.add('lc-preview','lc-preview-'+currentPlayer,'lc-taken');
+        cell.textContent = currentPlayer.toUpperCase();
+      } else if(mw){
+        cell.style.opacity='0.1'; cell.style.cursor='default';
+      } else if(!active){
+        cell.style.cursor='default';
+      }
+      if(!v && !mw && !isPending){
+        cell.addEventListener('click', ()=>{ handleCellClick(metaIdx, cellIdx); renderNav(); });
+        cell.addEventListener('mouseenter', ()=>highlightTarget(cellIdx));
+        cell.addEventListener('mouseleave', ()=>{ if(pendingMeta===null) clearTargetHighlight(); });
+      }
+      if(isPending){
+        cell.addEventListener('click', ()=>{ commitPreview(); renderNav(); });
+      }
+      row.appendChild(cell);
+    }
+    layerWrap.appendChild(row);
+    wrap.appendChild(layerWrap);
+  }
+  const ov = document.createElement('div');
+  ov.className = 'lb-won-overlay';
+  ov.style.fontSize = '38px';
+  if(mw){
+    ov.classList.add('show');
+    if(mw==='draw'){ ov.classList.add('draw'); ov.textContent='–'; }
+    else { ov.classList.add(mw); ov.textContent=mw.toUpperCase(); }
+  }
+  wrap.appendChild(ov);
+  return wrap;
+}
+
+function updateStatus(){
+  const lbl = document.getElementById('turn-label');
+  lbl.textContent = currentPlayer.toUpperCase() + "'S TURN";
+  lbl.style.color = currentPlayer === 'x' ? 'var(--x)' : 'var(--o)';
+
+  // meta progress dots
+  const prog = document.getElementById('meta-progress');
+  prog.innerHTML = '';
+  for(let i=0;i<27;i++){
+    const d = document.createElement('div');
+    d.className = 'prog-dot' + (metaWinners[i]==='x'?' x':metaWinners[i]==='o'?' o':'');
+    prog.appendChild(d);
+  }
+}
+
+function renderAll(){
+  if(currentView === 'layered') renderLayered();
+  else if(currentView === 'flat') renderFlat();
+  else renderNav();
+  updateStatus();
+}
+
+// ═══════════════════════════════════════════════════════
+// HOVER TARGET PREVIEW
+// ═══════════════════════════════════════════════════════
+
+function highlightTarget(cellIdx){
+  if(pendingMeta !== null) return; // don't override pending highlight
+  clearTargetHighlight();
+  if(gameOver) return;
+  // Determine which meta-board(s) would become active
+  const targetMeta = cellIdx; // direct mapping
+  const isFree = !metaWinners[targetMeta];
+  if(isFree){
+    // Highlight that specific board strongly
+    document.querySelectorAll(`.local-board-wrap[data-meta="${targetMeta}"]`).forEach(el=>{
+      el.classList.add('target-preview');
+    });
+  } else {
+    // Would send to any free board — highlight all softly
+    document.querySelectorAll('.local-board-wrap').forEach(el=>{
+      const mi = +el.dataset.meta;
+      if(!metaWinners[mi]) el.classList.add('target-preview-any');
+    });
+  }
+}
+
+function clearTargetHighlight(){
+  document.querySelectorAll('.target-preview, .target-preview-any').forEach(el=>{
+    el.classList.remove('target-preview','target-preview-any');
+  });
+}
+
+
+
+function setView(v){
+  currentView = v;
+  document.getElementById('view-layered').style.display = v==='layered' ? 'flex' : 'none';
+  document.getElementById('view-flat').style.display    = v==='flat'    ? 'flex' : 'none';
+  document.getElementById('view-nav').style.display     = v==='nav'     ? 'flex' : 'none';
+  ['layered','flat','nav'].forEach(n=>{
+    document.getElementById('btn-'+n).classList.toggle('on', n===v);
+  });
+  renderAll();
+}
+
+function setNavLayer(z){
+  navLayer = z; renderNav();
+}
+
+function toggleRules(){
+  const r = document.getElementById('rules-box');
+  r.classList.toggle('show');
+  document.getElementById('btn-rules').classList.toggle('on', r.classList.contains('show'));
+}
+
+// ═══════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════
+
+function resetGame(){
+  const s = scores || {x:0,o:0};
+  initState();
+  scores = s;
+  document.getElementById('win-modal').classList.remove('show');
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+scores = {x:0, o:0};
+initState();
+renderAll();
+</script>
+</body>
+</html>

@@ -24,7 +24,6 @@
   --won-x-bg: #e8ff5712;
   --won-o-bg: #ff6b6b12;
   --cell-size: 20px;
-  /* Local layer tints */
   --lz0: #1a2a1a;
   --lz0-border: #2a4a2a;
   --lz0-label: #4caf7d;
@@ -50,7 +49,6 @@ body {
   padding-bottom: 40px;
 }
 
-/* ── HEADER ── */
 header {
   width: 100%;
   padding: 22px 24px 14px;
@@ -72,7 +70,6 @@ h1 span.x-col { color: var(--x); }
 h1 span.o-col { color: var(--o); }
 .sub { font-size: 10px; letter-spacing: 0.3em; color: var(--text); text-transform: uppercase; }
 
-/* ── STATUS BAR ── */
 #statusbar {
   display: flex; align-items: center; gap: 20px;
   padding: 8px 20px;
@@ -101,7 +98,6 @@ h1 span.o-col { color: var(--o); }
 .prog-dot.x { background: var(--x); }
 .prog-dot.o { background: var(--o); }
 
-/* ── TOOLBAR ── */
 #toolbar {
   display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center;
 }
@@ -115,10 +111,8 @@ h1 span.o-col { color: var(--o); }
 .tbtn:hover { border-color: var(--active); color: var(--text-hi); }
 .tbtn.on { border-color: var(--active); color: var(--active); background: #5566ff11; }
 
-/* ── VIEW MODES ── */
 #view-container { width: 100%; display: flex; justify-content: center; }
 
-/* === FLAT VIEW === */
 #view-flat {
   display: flex; flex-direction: row; gap: 6px; padding: 16px;
   align-items: flex-start; flex-wrap: wrap; justify-content: center;
@@ -143,13 +137,11 @@ h1 span.o-col { color: var(--o); }
   display: grid; grid-template-columns: repeat(3, auto); gap: 5px;
 }
 
-/* === NAVIGATOR VIEW === */
 #view-nav {
   display: flex; flex-direction: row; align-items: flex-start; gap: 12px;
   padding: 16px; width: 100%; justify-content: center; flex-wrap: wrap;
 }
 
-/* Left & Right panels */
 .nav-side-panel {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   width: 200px; flex-shrink: 0;
@@ -168,19 +160,16 @@ h1 span.o-col { color: var(--o); }
   text-align: center; padding: 12px; box-sizing: border-box;
 }
 
-/* Fixed-size board containers — prevents reflow on hover */
 #nav-local-board, #nav-target-board {
   width: 200px; min-height: 320px;
   display: flex; align-items: flex-start; justify-content: center;
 }
 
-/* Target panel free-choice highlight */
 .nav-target-free .local-board-wrap:not(.won-x):not(.won-o):not(.drawn) {
   border-color: #ffcc0055 !important;
   box-shadow: 0 0 8px #ffcc0022 !important;
 }
 
-/* Center meta grid */
 #nav-center {
   display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
@@ -226,7 +215,6 @@ h1 span.o-col { color: var(--o); }
   position: absolute; bottom: 2px; right: 3px; font-family: 'Syne Mono', monospace;
 }
 
-/* ── LOCAL 3×3×3 BOARD ── */
 .local-board-wrap {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   padding: 4px; border-radius: 5px;
@@ -267,7 +255,6 @@ h1 span.o-col { color: var(--o); }
 .lc.lc-o { color: var(--o); cursor: default; }
 .lc.lc-taken { cursor: default; }
 
-/* Target preview highlight */
 .local-board-wrap.target-preview {
   border-color: #ffcc00 !important;
   box-shadow: 0 0 18px #ffcc0066 !important;
@@ -290,7 +277,6 @@ h1 span.o-col { color: var(--o); }
   background: #ffcc0010 !important;
 }
 
-/* Won overlay on local board */
 .lb-won-overlay {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -304,7 +290,26 @@ h1 span.o-col { color: var(--o); }
 .lb-won-overlay.o { color: var(--o); text-shadow: 0 0 16px var(--o); background: #ff6b6b08; }
 .lb-won-overlay.draw { color: var(--text); font-size: 14px; }
 
-/* ── MODE MODAL ── */
+/* ── RESUME BANNER ── */
+#resume-banner {
+  display: none;
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 12px;
+  padding: 12px 20px;
+  background: #5566ff11;
+  border: 1px solid var(--active);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-hi);
+  animation: fadeIn 0.4s ease;
+}
+#resume-banner.show { display: block; }
+#resume-banner strong { color: var(--active); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
 #mode-modal {
   position: fixed; inset: 0;
   background: rgba(10,10,15,0.92);
@@ -338,7 +343,6 @@ h1 span.o-col { color: var(--o); }
 .mode-btn.quick:hover   { border-color: #44cc88; box-shadow: 0 0 16px #44cc8833; }
 .mode-btn.blitz:hover   { border-color: var(--o); box-shadow: 0 0 16px #ff6b6b33; }
 
-/* ── WIN MODAL ── */
 #win-modal {
   position: fixed; inset: 0;
   background: rgba(10,10,15,0.88);
@@ -368,7 +372,6 @@ h1 span.o-col { color: var(--o); }
 }
 .win-box button:hover { box-shadow: 0 0 20px var(--active-glow); }
 
-/* ── CONFIRM BAR ── */
 #confirm-bar {
   display: none;
   position: sticky; bottom: 0; z-index: 50;
@@ -400,7 +403,6 @@ h1 span.o-col { color: var(--o); }
 }
 #btn-cancel:hover { border-color: var(--text); color: var(--text-hi); }
 
-/* Preview ghost cell */
 .lc.lc-preview {
   opacity: 0.5;
   background: #ffffff10;
@@ -419,7 +421,6 @@ h1 span.o-col { color: var(--o); }
 #rules-box h3 { font-family: 'Syne', sans-serif; font-size: 12px; color: var(--text-hi); margin-bottom: 8px; letter-spacing: 0.1em; }
 #rules-box strong { color: var(--text-hi); }
 
-/* ── AI SETUP PANEL ── */
 .ai-setup {
   margin-top: 20px; padding-top: 18px;
   border-top: 1px solid var(--border);
@@ -473,7 +474,6 @@ h1 span.o-col { color: var(--o); }
 .ai-opt-btn.x-sel.selected { border-color: var(--x); color: var(--x); background: #e8ff5711; }
 .ai-opt-btn.o-sel.selected { border-color: var(--o); color: var(--o); background: #ff6b6b11; }
 
-/* AI thinking indicator */
 #ai-thinking {
   display: none; position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
   background: var(--panel); border: 1px solid var(--border);
@@ -482,6 +482,57 @@ h1 span.o-col { color: var(--o); }
   z-index: 60;
 }
 #ai-thinking.show { display: block; }
+
+#share-modal {
+  position: fixed; inset: 0;
+  background: rgba(10,10,15,0.92);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 400; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s; backdrop-filter: blur(6px);
+}
+#share-modal.show { opacity: 1; pointer-events: all; }
+.share-box {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 32px 40px; text-align: center;
+  box-shadow: 0 0 60px rgba(85,102,255,0.12); max-width: 440px; width: 90%;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.share-box h3 {
+  font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800;
+  letter-spacing: 0.05em; color: var(--text-hi);
+}
+.share-box p { font-size: 10px; color: var(--text); letter-spacing: 0.12em; }
+.share-box p strong { color: var(--text-hi); }
+#share-url {
+  font-family: 'Syne Mono', monospace; font-size: 9px;
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 12px; word-break: break-all; text-align: left;
+  line-height: 1.6; max-height: 80px; overflow-y: auto;
+}
+.share-btn-row { display: flex; gap: 8px; justify-content: center; }
+#btn-copy-url {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  padding: 10px 24px; border-radius: 5px; letter-spacing: 0.12em;
+  border: 1.5px solid var(--active); background: transparent;
+  color: var(--active); cursor: pointer; transition: all 0.15s;
+}
+#btn-copy-url:hover { box-shadow: 0 0 16px var(--active-glow); }
+#btn-copy-url.copied { border-color: #44cc88; color: #44cc88; }
+#btn-share-done {
+  font-family: 'Syne Mono', monospace; font-size: 10px;
+  padding: 9px 20px; border-radius: 5px; letter-spacing: 0.1em;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text); cursor: pointer; transition: all 0.15s;
+}
+#btn-share-done:hover { border-color: var(--text); color: var(--text-hi); }
+
+.lc.lc-last-move {
+  box-shadow: inset 0 0 0 1.5px currentColor;
+  opacity: 1 !important;
+}
+.lc.lc-last-move.lc-x { box-shadow: inset 0 0 0 1.5px var(--x), 0 0 8px var(--x-dim); }
+.lc.lc-last-move.lc-o { box-shadow: inset 0 0 0 1.5px var(--o), 0 0 8px var(--o-dim); }
 </style>
 </head>
 <body>
@@ -490,6 +541,8 @@ h1 span.o-col { color: var(--o); }
   <h1><span class="x-col">3D</span> ULTIMATE <span class="o-col">TTT</span></h1>
   <div class="sub">27 local 3×3×3 games · 3×3×3 meta-grid · win the cube</div>
 </header>
+
+<div id="resume-banner"></div>
 
 <div id="statusbar">
   <div id="turn-label">X'S TURN</div>
@@ -505,7 +558,8 @@ h1 span.o-col { color: var(--o); }
 <div id="toolbar">
   <button class="tbtn" id="btn-flat" onclick="setView('flat')">FLAT GRID</button>
   <button class="tbtn on" id="btn-nav" onclick="setView('nav')">NAVIGATOR</button>
-  <button class="tbtn" onclick="resetGame()">RESET</button>
+  <button class="tbtn" id="btn-reset" onclick="resetGame()">RESET</button>
+  <button class="tbtn" id="btn-share" onclick="shareState()" style="display:none">SHARE</button>
   <button class="tbtn" id="btn-rules" onclick="toggleRules()">RULES</button>
 </div>
 
@@ -521,16 +575,13 @@ h1 span.o-col { color: var(--o); }
 <div id="view-container">
   <div id="view-flat" style="display:none"></div>
   <div id="view-nav">
-    <!-- Left: selected local board -->
     <div class="nav-side-panel" id="nav-left-panel">
       <div class="nav-panel-label" id="nav-left-label">SELECT A POSITION<span>to play here</span></div>
       <div id="nav-local-board"><div class="nav-panel-empty">SELECT A META<br>POSITION</div></div>
     </div>
-    <!-- Center: full meta grid all layers -->
     <div id="nav-center">
       <div id="nav-meta-all"></div>
     </div>
-    <!-- Right: target board (where opponent is sent) -->
     <div class="nav-side-panel" id="nav-right-panel">
       <div class="nav-panel-label" id="nav-right-label">OPPONENT SENT TO<span>hover a cell to preview</span></div>
       <div id="nav-target-board"><div class="nav-panel-empty">HOVER A CELL<br>TO PREVIEW</div></div>
@@ -546,7 +597,7 @@ h1 span.o-col { color: var(--o); }
 
 <div id="ai-thinking">AI THINKING…</div>
 
-<div id="mode-modal" class="show">
+<div id="mode-modal">
   <div class="mode-box">
     <h2>SELECT MODE</h2>
     <p>CHOOSE YOUR GAME</p>
@@ -585,6 +636,10 @@ h1 span.o-col { color: var(--o); }
           </div>
         </div>
       </div>
+      <div class="ai-toggle-row" style="margin-top:4px;">
+        <div class="ai-toggle-label">SHARE &amp; PLAY<span>pass via link each turn</span></div>
+        <button class="toggle-switch" id="sp-toggle" onclick="toggleSharePlay()"></button>
+      </div>
     </div>
   </div>
 </div>
@@ -597,6 +652,18 @@ h1 span.o-col { color: var(--o); }
   </div>
 </div>
 
+<div id="share-modal">
+  <div class="share-box">
+    <h3 id="share-title">YOUR MOVE DONE</h3>
+    <p id="share-sub">Share this link with <strong id="share-next-player">O</strong> — it's their turn.</p>
+    <div id="share-url"></div>
+    <div class="share-btn-row">
+      <button id="btn-copy-url" onclick="copyShareURL()">COPY LINK</button>
+      <button id="btn-share-done" onclick="closeShareModal()">DONE</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════
 // CONSTANTS & WIN LINES
@@ -604,7 +671,6 @@ h1 span.o-col { color: var(--o); }
 
 function li(z,y,x){ return z*9+y*3+x; }
 
-// 3D win lines (49) for 3×3×3 cube
 function buildWins3d(){
   const w = [];
   for(let z=0;z<3;z++) for(let y=0;y<3;y++) w.push([li(z,y,0),li(z,y,1),li(z,y,2)]);
@@ -618,7 +684,6 @@ function buildWins3d(){
   return w;
 }
 
-// 2D win lines (8) for 3×3 grid
 function buildWins2d(){
   const w = [];
   for(let r=0;r<3;r++) w.push([r*3,r*3+1,r*3+2]);
@@ -630,31 +695,29 @@ function buildWins2d(){
 const WINS3D = buildWins3d();
 const WINS2D = buildWins2d();
 
-// ═══════════════════════════════════════════════════════
-// MODE CONFIG
-// ═══════════════════════════════════════════════════════
-// mode: 'classic' | 'quick' | 'blitz'
-// classic: 3D meta (27 boards), 3D local (27 cells)
-// quick:   2D meta (9 boards),  3D local (27 cells)
-// blitz:   2D meta (9 boards),  2D local (9 cells)
-
 let gameMode = 'classic';
 
-// ═══════════════════════════════════════════════════════
-// AI STATE
-// ═══════════════════════════════════════════════════════
 let vsAI = false;
-let aiPlayer = 'o';       // which symbol AI plays
+let aiPlayer = 'o';
 let aiDifficulty = 'easy';
-let aiPending = false;    // true while AI turn is scheduled
+let aiPending = false;
+let sharePlay = false;
+let lastMoveMeta = null, lastMoveCell = null;
+let lastMoveCleared = false;
 
 function toggleAI(){
   vsAI = !vsAI;
+  if(vsAI && sharePlay){ sharePlay = false; document.getElementById('sp-toggle').classList.remove('on'); }
   document.getElementById('ai-toggle').classList.toggle('on', vsAI);
   document.getElementById('ai-options').classList.toggle('show', vsAI);
 }
+function toggleSharePlay(){
+  sharePlay = !sharePlay;
+  if(sharePlay && vsAI){ vsAI = false; document.getElementById('ai-toggle').classList.remove('on'); document.getElementById('ai-options').classList.remove('show'); }
+  document.getElementById('sp-toggle').classList.toggle('on', sharePlay);
+}
 function setAIPlayerPick(p){
-  aiPlayer = p === 'x' ? 'o' : 'x'; // AI is the other one
+  aiPlayer = p === 'x' ? 'o' : 'x';
   document.getElementById('pick-x').classList.toggle('selected', p === 'x');
   document.getElementById('pick-o').classList.toggle('selected', p === 'o');
 }
@@ -669,20 +732,11 @@ function localSize(){ return gameMode === 'blitz' ? 9 : 27; }
 function metaWins(){ return gameMode === 'classic' ? WINS3D : WINS2D; }
 function localWins(){ return gameMode === 'blitz' ? WINS2D : WINS3D; }
 
-// Cell index → target meta board index
-// classic: cellIdx directly maps (0-26 → 0-26)
-// quick/blitz: ignore z, use y*3+x of the cell
 function cellToTarget(cellIdx){
   if(gameMode === 'classic') return cellIdx;
-  // For 3D local: cellIdx = z*9 + y*3 + x → target = y*3+x
-  // For 2D local: cellIdx = y*3 + x → target = cellIdx
-  if(gameMode === 'blitz') return cellIdx; // already 0-8
-  return cellIdx % 9; // quick: strip z (z*9 + rem → rem)
+  if(gameMode === 'blitz') return cellIdx;
+  return cellIdx % 9;
 }
-
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
 
 let localCells, localWinners, metaWinners;
 let currentPlayer, activeMetaBoards, gameOver, navSelected;
@@ -696,12 +750,9 @@ function initState(){
   gameOver = false;
   navSelected = null;
   aiPending = false;
+  lastMoveMeta = null; lastMoveCell = null; lastMoveCleared = false;
   document.getElementById('ai-thinking').classList.remove('show');
 }
-
-// ═══════════════════════════════════════════════════════
-// GAME LOGIC
-// ═══════════════════════════════════════════════════════
 
 function isMetaActive(mi){
   if(metaWinners[mi]) return false;
@@ -721,18 +772,20 @@ function checkWin(arr, wins){
   return null;
 }
 
-// ═══════════════════════════════════════════════════════
-// PREVIEW STATE
-// ═══════════════════════════════════════════════════════
 let pendingMeta = null, pendingCell = null;
 
 function handleCellClick(metaIdx, cellIdx){
   if(gameOver) return;
-  if(vsAI && currentPlayer === aiPlayer) return; // block input on AI's turn
+  if(vsAI && currentPlayer === aiPlayer) return;
   if(aiPending) return;
   if(!isMetaActive(metaIdx)) return;
   if(localCells[metaIdx][cellIdx]) return;
   if(localWinners[metaIdx]) return;
+
+  if(sharePlay && !lastMoveCleared){
+    lastMoveCleared = true;
+    renderAll();
+  }
 
   if(pendingMeta === metaIdx && pendingCell === cellIdx){
     commitPreview(); return;
@@ -741,7 +794,6 @@ function handleCellClick(metaIdx, cellIdx){
   cancelPreview(true);
   pendingMeta = metaIdx;
   pendingCell = cellIdx;
-  // Auto-select in navigator so left panel is always populated
   if(currentView === 'nav') navSelected = metaIdx;
   renderAll();
   showConfirmBar();
@@ -755,8 +807,6 @@ function showConfirmBar(){
   lbl.innerHTML = `Place <strong>${currentPlayer.toUpperCase()}</strong> — confirm?`;
   btn.className = currentPlayer === 'o' ? 'o-turn' : '';
   btn.id = 'btn-confirm';
-  // renderAll() already called before this — nav target state is baked into DOM via makeNavCell/renderNavTarget
-  // For flat: apply board highlight directly since flat has no right panel
   if(currentView === 'flat'){
     applyTargetHighlight(cellToTarget(pendingCell));
   }
@@ -769,6 +819,8 @@ function commitPreview(){
   navHoverTarget = null;
   document.getElementById('confirm-bar').classList.remove('show');
   clearTargetHighlight();
+
+  lastMoveMeta = metaIdx; lastMoveCell = cellIdx;
 
   localCells[metaIdx][cellIdx] = currentPlayer;
 
@@ -793,11 +845,18 @@ function commitPreview(){
   renderAll();
   updateStatus();
 
-  // Schedule AI turn if applicable
   if(vsAI && currentPlayer === aiPlayer && !gameOver){
     aiPending = true;
     document.getElementById('ai-thinking').classList.add('show');
     setTimeout(()=>{ aiTakeTurn(); }, 450);
+    return;
+  }
+
+  if(sharePlay && !gameOver){
+    encodeStateToHash();
+    showShareModal();
+  } else if(!sharePlay){
+    encodeStateToHash();
   }
 }
 
@@ -817,11 +876,8 @@ function aiTakeTurn(){
   document.getElementById('ai-thinking').classList.remove('show');
   aiPending = false;
   if(gameOver) return;
-
   const move = aiDifficulty === 'hard' ? aiPickHard() : aiPickEasy();
   if(!move) return;
-
-  // Bypass preview system — place directly
   pendingMeta = move.metaIdx;
   pendingCell = move.cellIdx;
   commitPreview();
@@ -843,7 +899,6 @@ function getLegalMoves(){
   return moves;
 }
 
-// Count how many near-wins (2-in-a-row with empty third) a player has on a board
 function countNearWins(cells, player, wins){
   let count = 0;
   for(const [a,b,c] of wins){
@@ -863,7 +918,6 @@ function hasWinningMove(cells, player, wins){
   return false;
 }
 
-// Check if placing player at cellIdx in metaIdx wins that local board
 function wouldWinLocal(metaIdx, cellIdx, player){
   const cells = localCells[metaIdx].slice();
   cells[cellIdx] = player;
@@ -873,7 +927,6 @@ function wouldWinLocal(metaIdx, cellIdx, player){
   return false;
 }
 
-// Check if claiming metaIdx would win the meta for player
 function wouldWinMeta(metaIdx, player){
   const mw = metaWinners.slice();
   mw[metaIdx] = player;
@@ -883,7 +936,7 @@ function wouldWinMeta(metaIdx, player){
   return false;
 }
 
-const CENTER_3D = 13; // z=1,y=1,x=1
+const CENTER_3D = 13;
 const CENTER_2D = 4;
 const CORNERS_3D = [0,2,6,8,18,20,24,26];
 const CORNERS_2D = [0,2,6,8];
@@ -904,62 +957,200 @@ function aiPickHard(){
   const opp = me === 'x' ? 'o' : 'x';
   const moves = getLegalMoves();
   if(!moves.length) return null;
-
-  let best = null;
-  let bestScore = -Infinity;
-
+  let best = null, bestScore = -Infinity;
   for(const mv of moves){
     const {metaIdx, cellIdx} = mv;
     let score = 0;
-
     const winsLocal = wouldWinLocal(metaIdx, cellIdx, me);
-
-    // 1. Win meta
     if(winsLocal && wouldWinMeta(metaIdx, me)) score += 1000;
-
-    // 2. Block opponent meta win
     if(wouldWinLocal(metaIdx, cellIdx, opp) && wouldWinMeta(metaIdx, opp)){
-      // If we can block by claiming this board ourselves
-      if(winsLocal && wouldWinMeta(metaIdx, me)) { /* already scored above */ }
+      if(winsLocal && wouldWinMeta(metaIdx, me)) {}
       else score += 500;
     }
-
-    // 3. Win local board
     if(winsLocal) score += 100;
-
-    // 4. Block opponent local win
-    if(hasWinningMove(localCells[metaIdx].map((v,i)=> i===cellIdx ? me : v), opp, localWins())){
-      // rough: opponent has a near-win in this board
-    }
     if(countNearWins(localCells[metaIdx], opp, localWins()) > 0 && !localCells[metaIdx][cellIdx]){
-      // check if placing here blocks one of their near-wins
       const tempCells = localCells[metaIdx].slice();
       tempCells[cellIdx] = me;
       const before = countNearWins(localCells[metaIdx], opp, localWins());
       const after  = countNearWins(tempCells, opp, localWins());
       if(after < before) score += 50 * (before - after);
     }
-
-    // 5. Penalise sending opponent to a board where they have a near-win
     const targetMi = cellToTarget(cellIdx);
     if(!metaWinners[targetMi]){
       const oppNear = countNearWins(localCells[targetMi], opp, localWins());
       score -= oppNear * 40;
-      // Bonus for sending to a specific board (not free choice)
       score += 15;
     }
-    // Free choice is neutral (no bonus, no penalty beyond above)
-
-    // 6. Positional score
     score += cellPositionScore(cellIdx);
-
-    // Tiebreak jitter
     score += Math.random() * 0.5;
-
     if(score > bestScore){ bestScore = score; best = mv; }
   }
-
   return best;
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE ENCODING / DECODING
+// ═══════════════════════════════════════════════════════
+
+function encodeCells(cells){
+  const vals = cells.map(v => v === 'x' ? 1 : v === 'o' ? 2 : 0);
+  let result = '';
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_@!$%&*+=?';
+  for(let i = 0; i < vals.length; i += 4){
+    let n = 0;
+    for(let j = 0; j < 4; j++) n = n * 3 + (vals[i+j] ?? 0);
+    result += CHARS[n] ?? CHARS[0];
+  }
+  return result;
+}
+
+function decodeCells(str, length){
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_@!$%&*+=?';
+  const vals = [];
+  for(let i = 0; i < str.length; i++){
+    let n = CHARS.indexOf(str[i]);
+    if(n < 0) n = 0;
+    const chunk = [];
+    for(let j = 0; j < 4; j++){ chunk.unshift(n % 3); n = Math.floor(n / 3); }
+    vals.push(...chunk);
+  }
+  return vals.slice(0, length).map(v => v === 1 ? 'x' : v === 2 ? 'o' : null);
+}
+
+function encodeActive(active){
+  if(active === null) return 'N';
+  let mask = 0;
+  for(const i of active) mask |= (1 << i);
+  return mask.toString(36);
+}
+
+function decodeActive(str){
+  if(str === 'N') return null;
+  const mask = parseInt(str, 36);
+  const arr = [];
+  for(let i = 0; i < 27; i++) if(mask & (1 << i)) arr.push(i);
+  return arr.length ? arr : null;
+}
+
+function encodeStateToHash(){
+  try {
+    const modeChar = gameMode === 'classic' ? 'c' : gameMode === 'quick' ? 'q' : 'b';
+    const flags = modeChar
+      + currentPlayer
+      + (vsAI ? '1' : '0')
+      + aiPlayer
+      + (aiDifficulty === 'hard' ? 'h' : 'e')
+      + (sharePlay ? '1' : '0');
+    const allCells = localCells.flat();
+    const cellsEnc = encodeCells(allCells);
+    const metaEnc = encodeCells(metaWinners.map(v => v === 'draw' ? null : v));
+    const activeEnc = encodeActive(activeMetaBoards);
+    const lm = (lastMoveMeta !== null && lastMoveCell !== null)
+      ? lastMoveMeta.toString(36) + '.' + lastMoveCell.toString(36)
+      : 'N';
+    const goEnc = gameOver ? '1' : '0';
+    const encoded = [flags, cellsEnc, metaEnc, activeEnc, lm, goEnc].join('|');
+    history.replaceState(null, '', '#state=' + encoded);
+  } catch(e){}
+}
+
+function decodeStateFromHash(){
+  try {
+    const hash = location.hash;
+    if(!hash.startsWith('#state=')) return false;
+    const encoded = hash.slice(7);
+    const parts = encoded.split('|');
+    if(parts.length < 6) return false;
+    const [flags, cellsEnc, metaEnc, activeEnc, lm, goEnc] = parts;
+    const modeChar = flags[0];
+    gameMode = modeChar === 'c' ? 'classic' : modeChar === 'q' ? 'quick' : 'blitz';
+    const cp = flags[1];
+    if(cp !== 'x' && cp !== 'o') return false;
+    vsAI = flags[2] === '1';
+    aiPlayer = flags[3];
+    aiDifficulty = flags[4] === 'h' ? 'hard' : 'easy';
+    sharePlay = flags[5] === '1';
+    const mSz = metaSize(), lSz = localSize();
+    const allCells = decodeCells(cellsEnc, mSz * lSz);
+    localCells = [];
+    for(let i = 0; i < mSz; i++) localCells.push(allCells.slice(i * lSz, (i+1) * lSz));
+    const mwRaw = decodeCells(metaEnc, mSz);
+    metaWinners = mwRaw;
+    localWinners = localCells.map((cells, mi) => {
+      for(const [a,b,c] of localWins()){
+        if(cells[a] && cells[a]===cells[b] && cells[a]===cells[c]) return cells[a];
+      }
+      return metaWinners[mi] === 'draw' ? 'draw' : null;
+    });
+    activeMetaBoards = decodeActive(activeEnc);
+    currentPlayer = cp;
+    gameOver = goEnc === '1';
+    navSelected = null; aiPending = false;
+    if(lm !== 'N'){
+      const lmParts = lm.split('.');
+      lastMoveMeta = parseInt(lmParts[0], 36);
+      lastMoveCell = parseInt(lmParts[1], 36);
+      lastMoveCleared = false;
+    } else {
+      lastMoveMeta = null; lastMoveCell = null; lastMoveCleared = true;
+    }
+    return true;
+  } catch(e){ return false; }
+}
+
+// ═══════════════════════════════════════════════════════
+// RESUME BANNER
+// ═══════════════════════════════════════════════════════
+
+function showResumeBanner(){
+  const banner = document.getElementById('resume-banner');
+  const modeNames = { classic:'CLASSIC', quick:'QUICK PLAY', blitz:'BLITZ' };
+  const prevPlayer = currentPlayer === 'x' ? 'O' : 'X'; // who just played
+  const prevPlayerColor = prevPlayer === 'X' ? '#e8ff57' : '#ff6b6b';
+  banner.innerHTML = sharePlay
+    ? `RESUMED · <strong style="color:${prevPlayerColor}">${prevPlayer}</strong> just moved · it's your turn as <strong style="color:${currentPlayer==='x'?'#e8ff57':'#ff6b6b'}">${currentPlayer.toUpperCase()}</strong>`
+    : `GAME RESUMED · ${modeNames[gameMode]} · <strong style="color:${currentPlayer==='x'?'#e8ff57':'#ff6b6b'}">${currentPlayer.toUpperCase()}'S TURN</strong>`;
+  banner.classList.add('show');
+  // Auto-hide after 5 seconds
+  setTimeout(()=>{ banner.classList.remove('show'); }, 5000);
+}
+
+// ═══════════════════════════════════════════════════════
+// SHARE MODAL
+// ═══════════════════════════════════════════════════════
+
+function showShareModal(){
+  const url = location.href;
+  document.getElementById('share-url').textContent = url;
+  document.getElementById('share-next-player').textContent = currentPlayer.toUpperCase();
+  document.getElementById('share-title').textContent = 'YOUR MOVE IS DONE';
+  document.getElementById('btn-copy-url').textContent = 'COPY LINK';
+  document.getElementById('btn-copy-url').classList.remove('copied');
+  document.getElementById('share-modal').classList.add('show');
+}
+
+function shareState(){
+  encodeStateToHash();
+  showShareModal();
+}
+
+function copyShareURL(){
+  const url = location.href;
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn = document.getElementById('btn-copy-url');
+    btn.textContent = 'COPIED!';
+    btn.classList.add('copied');
+  }).catch(()=>{
+    const el = document.getElementById('share-url');
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+
+function closeShareModal(){
+  document.getElementById('share-modal').classList.remove('show');
 }
 
 function endGame(winner){
@@ -984,7 +1175,6 @@ function endGame(winner){
 
 let currentView = 'nav';
 
-// Build a local board cell element
 function makeCell(metaIdx, cellIdx, sz, forNav){
   const cell = document.createElement('div');
   cell.className = 'lc';
@@ -996,6 +1186,9 @@ function makeCell(metaIdx, cellIdx, sz, forNav){
   if(v){
     cell.classList.add('lc-'+v, 'lc-taken');
     cell.textContent = v.toUpperCase();
+    if(!lastMoveCleared && sharePlay && metaIdx === lastMoveMeta && cellIdx === lastMoveCell){
+      cell.classList.add('lc-last-move');
+    }
   } else if(isPending){
     cell.classList.add('lc-preview', 'lc-preview-'+currentPlayer, 'lc-taken');
     cell.textContent = currentPlayer.toUpperCase();
@@ -1030,52 +1223,37 @@ function makeCell(metaIdx, cellIdx, sz, forNav){
       }
     });
   }
-  if(isPending && !forNav){
-    cell.addEventListener('click', ()=>commitPreview());
-  }
-  if(isPending && forNav){
-    cell.addEventListener('click', ()=>{ commitPreview(); renderNav(); });
-  }
+  if(isPending && !forNav){ cell.addEventListener('click', ()=>commitPreview()); }
+  if(isPending && forNav){ cell.addEventListener('click', ()=>{ commitPreview(); renderNav(); }); }
   return cell;
 }
 
-// Build local board — works for both 2D and 3D local, compact or large
 function buildLocalBoard(metaIdx, sz, readOnly){
   const wrap = document.createElement('div');
   wrap.className = 'local-board-wrap';
   wrap.dataset.meta = metaIdx;
   wrap.style.setProperty('--cell-size', sz+'px');
   if(sz >= 28){ wrap.style.padding = '8px'; wrap.style.gap = '4px'; }
-
   const active = isMetaActive(metaIdx);
   const mw = metaWinners[metaIdx];
   if(active && !readOnly) wrap.classList.add('active-meta');
   if(mw === 'x') wrap.classList.add('won-x');
   else if(mw === 'o') wrap.classList.add('won-o');
   else if(mw === 'draw') wrap.classList.add('drawn');
-
   const isBlitz = gameMode === 'blitz';
   const zColors = ['var(--lz0-label)','var(--lz1-label)','var(--lz2-label)'];
-
   if(isBlitz){
-    // 2D local: single 3×3 grid
     const row = document.createElement('div');
-    row.className = 'lb-layer';
-    row.dataset.z = 0;
+    row.className = 'lb-layer'; row.dataset.z = 0;
     if(sz >= 28) row.style.gap = '2px';
     for(let i=0;i<9;i++){
-      row.appendChild(readOnly
-        ? makeReadOnlyCell(metaIdx, i, sz)
-        : makeCell(metaIdx, i, sz, false));
+      row.appendChild(readOnly ? makeReadOnlyCell(metaIdx,i,sz) : makeCell(metaIdx,i,sz,false));
     }
     wrap.appendChild(row);
   } else {
-    // 3D local: 3 layers
     for(let z=0;z<3;z++){
       const layerWrap = document.createElement('div');
-      layerWrap.style.cssText = sz >= 28
-        ? 'display:flex;flex-direction:column;gap:2px;'
-        : 'display:flex;flex-direction:column;gap:1px;';
+      layerWrap.style.cssText = sz >= 28 ? 'display:flex;flex-direction:column;gap:2px;' : 'display:flex;flex-direction:column;gap:1px;';
       const zLbl = document.createElement('div');
       zLbl.style.cssText = sz >= 28
         ? `font-size:9px;letter-spacing:.2em;color:${zColors[z]};font-weight:700;padding:0 3px;`
@@ -1083,34 +1261,28 @@ function buildLocalBoard(metaIdx, sz, readOnly){
       zLbl.textContent = sz >= 28 ? `LAYER Z=${z}` : `Z=${z}`;
       layerWrap.appendChild(zLbl);
       const row = document.createElement('div');
-      row.className = 'lb-layer';
-      row.dataset.z = z;
+      row.className = 'lb-layer'; row.dataset.z = z;
       if(sz >= 28) row.style.gap = '2px';
       for(let i=0;i<9;i++){
         const cellIdx = z*9+i;
-        row.appendChild(readOnly
-          ? makeReadOnlyCell(metaIdx, cellIdx, sz)
-          : makeCell(metaIdx, cellIdx, sz, false));
+        row.appendChild(readOnly ? makeReadOnlyCell(metaIdx,cellIdx,sz) : makeCell(metaIdx,cellIdx,sz,false));
       }
       layerWrap.appendChild(row);
       wrap.appendChild(layerWrap);
     }
   }
-
-  // Won overlay
   const ov = document.createElement('div');
   ov.className = 'lb-won-overlay';
   if(sz >= 28) ov.style.fontSize = '38px';
   if(mw){
     ov.classList.add('show');
-    if(mw === 'draw'){ ov.classList.add('draw'); ov.textContent = '–'; }
-    else { ov.classList.add(mw); ov.textContent = mw.toUpperCase(); }
+    if(mw==='draw'){ ov.classList.add('draw'); ov.textContent='–'; }
+    else { ov.classList.add(mw); ov.textContent=mw.toUpperCase(); }
   }
   wrap.appendChild(ov);
   return wrap;
 }
 
-// Read-only cell for right panel display
 function makeReadOnlyCell(metaIdx, cellIdx, sz){
   const cell = document.createElement('div');
   cell.className = 'lc';
@@ -1118,12 +1290,11 @@ function makeReadOnlyCell(metaIdx, cellIdx, sz){
   cell.style.cursor = 'default';
   const v = localCells[metaIdx][cellIdx];
   const mw = metaWinners[metaIdx];
-  if(v){ cell.classList.add('lc-'+v,'lc-taken'); cell.textContent = v.toUpperCase(); }
+  if(v){ cell.classList.add('lc-'+v,'lc-taken'); cell.textContent=v.toUpperCase(); }
   else if(mw){ cell.style.opacity='0.1'; cell.classList.add('lc-taken'); }
   return cell;
 }
 
-// Build large nav board with nav hover wiring
 function buildNavBoard(metaIdx, readOnly){
   const sz = 32;
   const wrap = document.createElement('div');
@@ -1131,17 +1302,14 @@ function buildNavBoard(metaIdx, readOnly){
   wrap.dataset.meta = metaIdx;
   wrap.style.setProperty('--cell-size', sz+'px');
   wrap.style.padding = '8px'; wrap.style.gap = '4px';
-
   const active = isMetaActive(metaIdx);
   const mw = metaWinners[metaIdx];
   if(active && !readOnly) wrap.classList.add('active-meta');
   if(mw === 'x') wrap.classList.add('won-x');
   else if(mw === 'o') wrap.classList.add('won-o');
   else if(mw === 'draw') wrap.classList.add('drawn');
-
   const isBlitz = gameMode === 'blitz';
   const zColors = ['var(--lz0-label)','var(--lz1-label)','var(--lz2-label)'];
-
   if(isBlitz){
     const row = document.createElement('div');
     row.className = 'lb-layer'; row.dataset.z = 0; row.style.gap = '2px';
@@ -1167,7 +1335,6 @@ function buildNavBoard(metaIdx, readOnly){
       wrap.appendChild(layerWrap);
     }
   }
-
   const ov = document.createElement('div');
   ov.className = 'lb-won-overlay'; ov.style.fontSize = '38px';
   if(mw){
@@ -1197,7 +1364,6 @@ function renderFlat(){
       c.appendChild(group);
     }
   } else {
-    // 2D meta: single 3×3 group of 9 boards
     const group = document.createElement('div');
     group.className = 'flat-meta-group'; group.dataset.mz = 1;
     const lbl = document.createElement('div');
@@ -1215,9 +1381,7 @@ function renderFlat(){
 function renderNav(){
   const metaAll = document.getElementById('nav-meta-all');
   metaAll.innerHTML = '';
-
   if(gameMode === 'classic'){
-    // 3 layers stacked
     for(let z=0;z<3;z++){
       const layerWrap = document.createElement('div');
       layerWrap.className = 'nav-meta-layer'; layerWrap.dataset.z = z;
@@ -1238,7 +1402,6 @@ function renderNav(){
       }
     }
   } else {
-    // Single 3×3 grid
     const layerWrap = document.createElement('div');
     layerWrap.className = 'nav-meta-layer'; layerWrap.dataset.z = 0;
     const lbl = document.createElement('div');
@@ -1246,14 +1409,10 @@ function renderNav(){
     layerWrap.appendChild(lbl);
     const grid = document.createElement('div');
     grid.className = 'nav-meta-layer-grid';
-    for(let i=0;i<9;i++){
-      grid.appendChild(makeNavCell(i, `${Math.floor(i/3)}·${i%3}`));
-    }
+    for(let i=0;i<9;i++) grid.appendChild(makeNavCell(i, `${Math.floor(i/3)}·${i%3}`));
     layerWrap.appendChild(grid);
     metaAll.appendChild(layerWrap);
   }
-
-  // Left panel
   const leftBoard = document.getElementById('nav-local-board');
   const leftLabel = document.getElementById('nav-left-label');
   leftBoard.innerHTML = '';
@@ -1268,7 +1427,6 @@ function renderNav(){
     leftLabel.innerHTML = `SELECT A POSITION<span>to play here</span>`;
     leftBoard.innerHTML = '<div class="nav-panel-empty">SELECT A META<br>POSITION</div>';
   }
-
   renderNavTarget();
 }
 
@@ -1294,15 +1452,12 @@ function renderNavTarget(){
   const rightLabel = document.getElementById('nav-right-label');
   rightBoard.innerHTML = '';
   rightBoard.className = '';
-
   const targetIdx = (pendingMeta !== null) ? cellToTarget(pendingCell) : navHoverTarget;
-
   if(targetIdx === null || targetIdx === undefined){
     rightLabel.innerHTML = `OPPONENT SENT TO<span>hover a cell to preview</span>`;
     rightBoard.innerHTML = '<div class="nav-panel-empty">HOVER A CELL<br>TO PREVIEW</div>';
     return;
   }
-
   const isClaimed = !!metaWinners[targetIdx];
   const lockedStr = pendingMeta !== null ? ' · LOCKED' : '';
   const coordStr = gameMode === 'classic'
@@ -1327,15 +1482,11 @@ function updateStatus(){
     lbl.textContent = currentPlayer.toUpperCase() + "'S TURN";
   }
   lbl.style.color = currentPlayer === 'x' ? 'var(--x)' : 'var(--o)';
-
   const modeLbl = document.getElementById('mode-label');
   const modeNames = { classic:'CLASSIC · 3D×3D', quick:'QUICK · 2D×3D', blitz:'BLITZ · 2D×2D' };
   modeLbl.textContent = modeNames[gameMode];
-
-  // Z legend — hide for blitz
   const zLegend = document.querySelector('#statusbar > div:last-child');
   if(zLegend) zLegend.style.display = gameMode === 'blitz' ? 'none' : 'flex';
-
   const prog = document.getElementById('meta-progress');
   prog.innerHTML = '';
   for(let i=0;i<metaSize();i++){
@@ -1350,10 +1501,6 @@ function renderAll(){
   else renderNav();
   updateStatus();
 }
-
-// ═══════════════════════════════════════════════════════
-// HOVER TARGET PREVIEW
-// ═══════════════════════════════════════════════════════
 
 function applyTargetHighlight(targetMeta){
   clearTargetHighlight();
@@ -1407,13 +1554,22 @@ function startGame(mode){
   gameMode = mode;
   document.getElementById('mode-modal').classList.remove('show');
   document.getElementById('win-modal').classList.remove('show');
-
-  // Init state first so localCells exists before any render
   initState();
+  applyToolbarForMode();
+  renderAll();
+  encodeStateToHash();
+  if(vsAI && aiPlayer === 'x' && !gameOver){
+    aiPending = true;
+    document.getElementById('ai-thinking').classList.add('show');
+    setTimeout(()=>{ aiTakeTurn(); }, 600);
+  }
+}
 
-  // Blitz: hide navigator, force flat
+function applyToolbarForMode(){
+  document.getElementById('btn-reset').style.display = sharePlay ? 'none' : '';
+  document.getElementById('btn-share').style.display = sharePlay ? '' : 'none';
   const navBtn = document.getElementById('btn-nav');
-  if(mode === 'blitz'){
+  if(gameMode === 'blitz'){
     navBtn.style.display = 'none';
     currentView = 'flat';
     document.getElementById('view-flat').style.display = 'flex';
@@ -1422,32 +1578,55 @@ function startGame(mode){
     document.getElementById('btn-nav').classList.remove('on');
   } else {
     navBtn.style.display = '';
+    // Auto-select the last-played board in navigator for context
+    if(lastMoveMeta !== null && !lastMoveCleared){
+      navSelected = lastMoveMeta;
+    }
     currentView = 'nav';
     document.getElementById('view-flat').style.display = 'none';
     document.getElementById('view-nav').style.display = 'flex';
     document.getElementById('btn-flat').classList.remove('on');
     document.getElementById('btn-nav').classList.add('on');
   }
-
-  renderAll();
-
-  // If AI plays X, it goes first
-  if(vsAI && aiPlayer === 'x' && !gameOver){
-    aiPending = true;
-    document.getElementById('ai-thinking').classList.add('show');
-    setTimeout(()=>{ aiTakeTurn(); }, 600);
-  }
 }
 
 function resetGame(){
+  history.replaceState(null, '', location.pathname + location.search);
   document.getElementById('win-modal').classList.remove('show');
+  document.getElementById('resume-banner').classList.remove('show');
+  vsAI = false; sharePlay = false;
+  document.getElementById('ai-toggle').classList.remove('on');
+  document.getElementById('ai-options').classList.remove('show');
+  document.getElementById('sp-toggle').classList.remove('on');
   document.getElementById('mode-modal').classList.add('show');
 }
 
 // ═══════════════════════════════════════════════════════
-// INIT
+// INIT — restore from hash or show mode modal
 // ═══════════════════════════════════════════════════════
-// Mode modal shown on load — game starts when player picks a mode
+(function init(){
+  if(decodeStateFromHash()){
+    // Valid game state found in URL — resume immediately, no modal
+    document.getElementById('mode-modal').classList.remove('show');
+    applyToolbarForMode();
+    renderAll();
+    updateStatus();
+    // Show resume banner to orient the player
+    showResumeBanner();
+    if(gameOver){
+      const gw = checkWin(metaWinners, metaWins());
+      if(gw) endGame(gw);
+    } else if(vsAI && currentPlayer === aiPlayer){
+      // If it's AI's turn on load (shouldn't normally happen in share-play but handle it)
+      aiPending = true;
+      document.getElementById('ai-thinking').classList.add('show');
+      setTimeout(()=>{ aiTakeTurn(); }, 600);
+    }
+  } else {
+    // No valid state — show mode selection modal
+    document.getElementById('mode-modal').classList.add('show');
+  }
+})();
 </script>
 </body>
 </html>

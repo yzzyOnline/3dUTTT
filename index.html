@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3D Ultimate TTT</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
 
 :root {
   --bg: #0a0a0f;
@@ -41,7 +41,7 @@ html, body { height: 100%; }
 body {
   background: var(--bg);
   color: var(--text-hi);
-  font-family: 'Syne Mono', monospace;
+  font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -60,30 +60,51 @@ header {
   margin-bottom: 16px;
 }
 h1 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: clamp(20px, 4vw, 38px);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-hi);
 }
-h1 span.x-col { color: var(--x); }
+h1 span.x-col { color: var(--x); letter-spacing: -0.01em; }
 h1 span.o-col { color: var(--o); }
 .sub { font-size: 10px; letter-spacing: 0.3em; color: var(--text); text-transform: uppercase; }
 
+/* ── STATUS BAR ── */
 #statusbar {
   display: flex; align-items: center; gap: 20px;
-  padding: 8px 20px;
+  padding: 10px 24px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  margin-bottom: 14px;
+  border-radius: 8px;
+  margin-bottom: 6px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+  max-width: 820px;
 }
+
+/* Big prominent turn indicator */
+#turn-indicator {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 6px;
+  padding: 8px 18px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#turn-indicator.x-turn { border-color: var(--x); box-shadow: 0 0 18px var(--x-dim); }
+#turn-indicator.o-turn { border-color: var(--o); box-shadow: 0 0 18px var(--o-dim); }
+#turn-pip {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--x); transition: background 0.2s;
+  flex-shrink: 0;
+}
+#turn-pip.o { background: var(--o); }
 #turn-label {
-  font-family: 'Syne', sans-serif;
-  font-size: 13px; font-weight: 700;
-  letter-spacing: 0.05em;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 15px; font-weight: 800;
+  letter-spacing: 0.08em;
   transition: color 0.2s;
 }
 #mode-label {
@@ -98,11 +119,28 @@ h1 span.o-col { color: var(--o); }
 .prog-dot.x { background: var(--x); }
 .prog-dot.o { background: var(--o); }
 
+/* ── HINT BAR ── */
+#hint-bar {
+  width: 100%; max-width: 820px;
+  padding: 7px 18px;
+  background: #5566ff0a;
+  border: 1px solid #5566ff22;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  text-align: center;
+  transition: opacity 0.3s;
+}
+#hint-bar strong { color: var(--text-hi); font-family: 'IBM Plex Mono', monospace; font-weight: 400; }
+#hint-bar span.hl { color: var(--active); }
+
 #toolbar {
   display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center;
 }
 .tbtn {
-  font-family: 'Syne Mono', monospace; font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
   padding: 6px 14px; border-radius: 4px;
   background: var(--panel); border: 1px solid var(--border);
   color: var(--text); cursor: pointer; letter-spacing: 0.1em;
@@ -146,12 +184,24 @@ h1 span.o-col { color: var(--o); }
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   width: 200px; flex-shrink: 0;
 }
+
+/* Panel labels redesigned to be more instructional */
 .nav-panel-label {
-  font-size: 9px; letter-spacing: 0.25em; color: var(--text);
-  text-transform: uppercase; opacity: 0.7; text-align: center;
-  min-height: 28px;
+  font-size: 10px; letter-spacing: 0.18em; color: var(--text-hi);
+  text-transform: uppercase; text-align: center;
+  min-height: 32px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
-.nav-panel-label span { display: block; font-size: 8px; opacity: 0.6; margin-top: 2px; }
+.nav-panel-label .label-main { font-weight: 700; }
+.nav-panel-label .label-sub { font-size: 8px; color: var(--text); letter-spacing: 0.15em; opacity: 0.7; }
+.nav-panel-label.active-label { border-color: var(--active); color: var(--active); background: #5566ff08; }
+.nav-panel-label.target-label { border-color: #ffcc0066; color: #ffcc00; background: #ffcc0008; }
+
 .nav-panel-empty {
   width: 200px; height: 320px;
   display: flex; align-items: center; justify-content: center;
@@ -178,6 +228,14 @@ h1 span.o-col { color: var(--o); }
   padding: 12px; background: var(--panel);
   border: 1px solid var(--border); border-radius: 8px;
 }
+
+/* Center panel title */
+#nav-center-label {
+  font-size: 9px; letter-spacing: 0.25em; color: var(--text);
+  text-transform: uppercase; text-align: center; opacity: 0.7;
+  margin-bottom: 2px;
+}
+
 .nav-meta-layer {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
 }
@@ -198,7 +256,7 @@ h1 span.o-col { color: var(--o); }
   border: 1.5px solid var(--border2);
   border-radius: 4px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 800;
   transition: all 0.15s; background: var(--surface); position: relative;
   flex-direction: column; gap: 2px;
 }
@@ -212,7 +270,7 @@ h1 span.o-col { color: var(--o); }
 .nav-cell.nav-active-board.nav-selected { border-color: var(--active); box-shadow: 0 0 12px var(--active-glow); background: #5566ff14; }
 .nav-cell-coord {
   font-size: 7px; letter-spacing: 0.1em; color: var(--text); opacity: 0.45;
-  position: absolute; bottom: 2px; right: 3px; font-family: 'Syne Mono', monospace;
+  position: absolute; bottom: 2px; right: 3px; font-family: 'IBM Plex Mono', monospace;
 }
 
 .local-board-wrap {
@@ -240,7 +298,7 @@ h1 span.o-col { color: var(--o); }
 .lc {
   width: var(--cell-size); height: var(--cell-size);
   display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; font-family: 'Syne', sans-serif;
+  font-size: 9px; font-weight: 700; font-family: 'IBM Plex Mono', monospace;
   cursor: pointer; border-radius: 2px;
   transition: background 0.1s;
   color: var(--text);
@@ -280,7 +338,7 @@ h1 span.o-col { color: var(--o); }
 .lb-won-overlay {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 800;
   border-radius: 4px; pointer-events: none;
   opacity: 0; transition: opacity 0.3s;
   z-index: 3;
@@ -290,11 +348,10 @@ h1 span.o-col { color: var(--o); }
 .lb-won-overlay.o { color: var(--o); text-shadow: 0 0 16px var(--o); background: #ff6b6b08; }
 .lb-won-overlay.draw { color: var(--text); font-size: 14px; }
 
-/* ── RESUME BANNER ── */
 #resume-banner {
   display: none;
   width: 100%;
-  max-width: 680px;
+  max-width: 820px;
   margin-bottom: 12px;
   padding: 12px 20px;
   background: #5566ff11;
@@ -310,6 +367,7 @@ h1 span.o-col { color: var(--o); }
 #resume-banner strong { color: var(--active); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
+/* ── MODE MODAL ── redesigned for clarity */
 #mode-modal {
   position: fixed; inset: 0;
   background: rgba(10,10,15,0.92);
@@ -320,28 +378,49 @@ h1 span.o-col { color: var(--o); }
 #mode-modal.show { opacity: 1; pointer-events: all; }
 .mode-box {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 10px; padding: 36px 48px; text-align: center;
-  box-shadow: 0 0 60px rgba(85,102,255,0.12); max-width: 480px; width: 90%;
+  border-radius: 12px; padding: 36px 44px; text-align: center;
+  box-shadow: 0 0 60px rgba(85,102,255,0.12); max-width: 500px; width: 92%;
 }
+.mode-box .game-intro {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; color: var(--text); letter-spacing: 0.12em;
+  line-height: 1.8; margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-radius: 6px;
+  border-left: 3px solid var(--active);
+  text-align: left;
+}
+.mode-box .game-intro strong { color: var(--text-hi); }
 .mode-box h2 {
-  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 800;
   letter-spacing: 0.05em; color: var(--text-hi); margin-bottom: 6px;
 }
-.mode-box p { font-size: 10px; color: var(--text); letter-spacing: 0.1em; margin-bottom: 28px; }
-.mode-options { display: flex; flex-direction: column; gap: 10px; }
+.mode-box .choose-label {
+  font-size: 9px; color: var(--text); letter-spacing: 0.2em;
+  text-transform: uppercase; margin-bottom: 16px; display: block;
+}
+.mode-options { display: flex; flex-direction: column; gap: 8px; }
 .mode-btn {
-  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-  padding: 14px 20px; border-radius: 6px; letter-spacing: 0.1em;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
+  padding: 14px 18px; border-radius: 8px; letter-spacing: 0.06em;
   border: 1.5px solid var(--border2); background: var(--surface);
   color: var(--text-hi); cursor: pointer; transition: all 0.15s;
-  text-align: left; display: flex; flex-direction: column; gap: 4px;
+  text-align: left; display: flex; align-items: center; gap: 14px;
 }
 .mode-btn:hover { border-color: var(--active); box-shadow: 0 0 16px var(--active-glow); }
+.mode-btn .mode-icon {
+  font-size: 22px; flex-shrink: 0; width: 32px; text-align: center;
+}
+.mode-btn .mode-info { display: flex; flex-direction: column; gap: 3px; }
 .mode-btn .mode-name { font-size: 13px; }
-.mode-btn .mode-desc { font-size: 9px; color: var(--text); font-family: 'Syne Mono', monospace; letter-spacing: 0.15em; font-weight: 400; }
-.mode-btn.classic:hover { border-color: var(--x); box-shadow: 0 0 16px #e8ff5733; }
+.mode-btn .mode-desc { font-size: 9px; color: var(--text); font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.12em; font-weight: 400; line-height: 1.5; }
+.mode-btn.classic:hover { border-color: var(--active); box-shadow: 0 0 16px #5566ff33; }
 .mode-btn.quick:hover   { border-color: #44cc88; box-shadow: 0 0 16px #44cc8833; }
 .mode-btn.blitz:hover   { border-color: var(--o); box-shadow: 0 0 16px #ff6b6b33; }
+.mode-btn.classic { border-left: 3px solid var(--active); }
+.mode-btn.quick   { border-left: 3px solid #44cc88; }
+.mode-btn.blitz   { border-left: 3px solid var(--o); }
 
 #win-modal {
   position: fixed; inset: 0;
@@ -357,7 +436,7 @@ h1 span.o-col { color: var(--o); }
   box-shadow: 0 0 80px rgba(85,102,255,0.15);
 }
 .win-box h2 {
-  font-family: 'Syne', sans-serif; font-size: clamp(28px, 6vw, 52px);
+  font-family: 'IBM Plex Mono', monospace; font-size: clamp(28px, 6vw, 52px);
   font-weight: 800; margin-bottom: 8px;
 }
 .win-box h2.x { color: var(--x); }
@@ -365,7 +444,7 @@ h1 span.o-col { color: var(--o); }
 .win-box h2.draw { color: var(--text-hi); }
 .win-box p { color: var(--text); font-size: 12px; margin-bottom: 28px; letter-spacing: 0.1em; }
 .win-box button {
-  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700;
   padding: 12px 36px; border-radius: 5px; letter-spacing: 0.15em;
   border: 1.5px solid var(--active); background: transparent; color: var(--text-hi);
   cursor: pointer; transition: all 0.2s;
@@ -387,7 +466,7 @@ h1 span.o-col { color: var(--o); }
 }
 #confirm-bar .preview-label strong { color: var(--text-hi); }
 #btn-confirm {
-  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 12px;
   padding: 9px 28px; border-radius: 5px; letter-spacing: 0.12em;
   border: 1.5px solid var(--x); background: transparent;
   color: var(--x); cursor: pointer; transition: all 0.15s;
@@ -396,7 +475,7 @@ h1 span.o-col { color: var(--o); }
 #btn-confirm:hover { box-shadow: 0 0 16px #e8ff5766; }
 #btn-confirm.o-turn:hover { box-shadow: 0 0 16px #ff6b6b66; }
 #btn-cancel {
-  font-family: 'Syne Mono', monospace; font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
   padding: 8px 18px; border-radius: 5px; letter-spacing: 0.1em;
   border: 1px solid var(--border); background: transparent;
   color: var(--text); cursor: pointer; transition: all 0.15s;
@@ -410,15 +489,16 @@ h1 span.o-col { color: var(--o); }
 }
 .lc.lc-preview.lc-preview-x { color: var(--x); }
 .lc.lc-preview.lc-preview-o { color: var(--o); }
+
 #rules-box {
-  display: none; max-width: 680px; width: 90%;
+  display: none; max-width: 820px; width: 90%;
   padding: 18px 24px; background: var(--panel);
   border: 1px solid var(--border); border-radius: 6px;
   font-size: 11px; color: var(--text); line-height: 1.9;
   margin-bottom: 14px;
 }
 #rules-box.show { display: block; }
-#rules-box h3 { font-family: 'Syne', sans-serif; font-size: 12px; color: var(--text-hi); margin-bottom: 8px; letter-spacing: 0.1em; }
+#rules-box h3 { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-hi); margin-bottom: 8px; letter-spacing: 0.1em; }
 #rules-box strong { color: var(--text-hi); }
 
 .ai-setup {
@@ -431,10 +511,10 @@ h1 span.o-col { color: var(--o); }
   gap: 12px;
 }
 .ai-toggle-label {
-  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
   letter-spacing: 0.08em; color: var(--text-hi);
 }
-.ai-toggle-label span { font-size: 9px; color: var(--text); font-family: 'Syne Mono', monospace; display: block; margin-top: 2px; font-weight: 400; letter-spacing: 0.15em; }
+.ai-toggle-label span { font-size: 9px; color: var(--text); font-family: 'IBM Plex Mono', monospace; display: block; margin-top: 2px; font-weight: 400; letter-spacing: 0.15em; }
 .toggle-switch {
   width: 40px; height: 22px; border-radius: 11px;
   background: var(--border2); border: none; cursor: pointer;
@@ -464,7 +544,7 @@ h1 span.o-col { color: var(--o); }
   display: flex; gap: 6px;
 }
 .ai-opt-btn {
-  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
   padding: 8px 16px; border-radius: 5px; letter-spacing: 0.08em;
   border: 1.5px solid var(--border2); background: var(--surface);
   color: var(--text); cursor: pointer; transition: all 0.15s; flex: 1;
@@ -498,13 +578,13 @@ h1 span.o-col { color: var(--o); }
   display: flex; flex-direction: column; gap: 16px;
 }
 .share-box h3 {
-  font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800;
+  font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 800;
   letter-spacing: 0.05em; color: var(--text-hi);
 }
 .share-box p { font-size: 10px; color: var(--text); letter-spacing: 0.12em; }
 .share-box p strong { color: var(--text-hi); }
 #share-url {
-  font-family: 'Syne Mono', monospace; font-size: 9px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
   color: var(--text); background: var(--surface);
   border: 1px solid var(--border); border-radius: 4px;
   padding: 8px 12px; word-break: break-all; text-align: left;
@@ -512,7 +592,7 @@ h1 span.o-col { color: var(--o); }
 }
 .share-btn-row { display: flex; gap: 8px; justify-content: center; }
 #btn-copy-url {
-  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700;
   padding: 10px 24px; border-radius: 5px; letter-spacing: 0.12em;
   border: 1.5px solid var(--active); background: transparent;
   color: var(--active); cursor: pointer; transition: all 0.15s;
@@ -520,7 +600,7 @@ h1 span.o-col { color: var(--o); }
 #btn-copy-url:hover { box-shadow: 0 0 16px var(--active-glow); }
 #btn-copy-url.copied { border-color: #44cc88; color: #44cc88; }
 #btn-share-done {
-  font-family: 'Syne Mono', monospace; font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
   padding: 9px 20px; border-radius: 5px; letter-spacing: 0.1em;
   border: 1px solid var(--border); background: transparent;
   color: var(--text); cursor: pointer; transition: all 0.15s;
@@ -533,27 +613,44 @@ h1 span.o-col { color: var(--o); }
 }
 .lc.lc-last-move.lc-x { box-shadow: inset 0 0 0 1.5px var(--x), 0 0 8px var(--x-dim); }
 .lc.lc-last-move.lc-o { box-shadow: inset 0 0 0 1.5px var(--o), 0 0 8px var(--o-dim); }
+
+/* z-legend pill */
+.z-legend { display: flex; gap: 6px; align-items: center; }
+.z-pill {
+  font-size: 9px; letter-spacing: 0.1em; padding: 2px 8px;
+  border-radius: 10px; border: 1px solid;
+}
+.z-pill.z0 { color: var(--lz0-label); border-color: var(--lz0-border); background: #1a2a1a44; }
+.z-pill.z1 { color: var(--lz1-label); border-color: var(--lz1-border); background: #1a1a2e44; }
+.z-pill.z2 { color: var(--lz2-label); border-color: var(--lz2-border); background: #2e1a1a44; }
 </style>
 </head>
 <body>
 
 <header>
   <h1><span class="x-col">3D</span> ULTIMATE <span class="o-col">TTT</span></h1>
-  <div class="sub">27 local 3×3×3 games · 3×3×3 meta-grid · win the cube</div>
+  <div class="sub">tic-tac-toe · 3 dimensions · 27 boards · one cube to rule them all</div>
 </header>
 
 <div id="resume-banner"></div>
 
 <div id="statusbar">
-  <div id="turn-label">X'S TURN</div>
-  <div id="mode-label">CLASSIC</div>
+  <div id="turn-indicator" class="x-turn">
+    <div id="turn-pip"></div>
+    <div>
+      <div id="turn-label">X'S TURN</div>
+      <div id="mode-label">CLASSIC</div>
+    </div>
+  </div>
   <div id="meta-progress"></div>
-  <div style="display:flex;gap:8px;align-items:center;font-size:9px;letter-spacing:.1em;">
-    <span style="color:var(--lz0-label)">▪ Z=0</span>
-    <span style="color:var(--lz1-label)">▪ Z=1</span>
-    <span style="color:var(--lz2-label)">▪ Z=2</span>
+  <div class="z-legend" id="z-legend">
+    <div class="z-pill z0">Z=0</div>
+    <div class="z-pill z1">Z=1</div>
+    <div class="z-pill z2">Z=2</div>
   </div>
 </div>
+
+<div id="hint-bar" style="display:none"><span id="hint-text"></span></div>
 
 <div id="toolbar">
   <button class="tbtn" id="btn-flat" onclick="setView('flat')">FLAT GRID</button>
@@ -576,14 +673,21 @@ h1 span.o-col { color: var(--o); }
   <div id="view-flat" style="display:none"></div>
   <div id="view-nav">
     <div class="nav-side-panel" id="nav-left-panel">
-      <div class="nav-panel-label" id="nav-left-label">SELECT A POSITION<span>to play here</span></div>
-      <div id="nav-local-board"><div class="nav-panel-empty">SELECT A META<br>POSITION</div></div>
+      <div class="nav-panel-label active-label" id="nav-left-label">
+        <span class="label-main">YOUR BOARD</span>
+        <span class="label-sub">click a cell to play here</span>
+      </div>
+      <div id="nav-local-board"><div class="nav-panel-empty">SELECT A BOARD<br>FROM THE CENTER</div></div>
     </div>
     <div id="nav-center">
+      <div id="nav-center-label">META-GRID · CLICK TO SELECT</div>
       <div id="nav-meta-all"></div>
     </div>
     <div class="nav-side-panel" id="nav-right-panel">
-      <div class="nav-panel-label" id="nav-right-label">OPPONENT SENT TO<span>hover a cell to preview</span></div>
+      <div class="nav-panel-label target-label" id="nav-right-label">
+        <span class="label-main">OPPONENT'S NEXT BOARD</span>
+        <span class="label-sub">hover a cell to preview</span>
+      </div>
       <div id="nav-target-board"><div class="nav-panel-empty">HOVER A CELL<br>TO PREVIEW</div></div>
     </div>
   </div>
@@ -599,26 +703,33 @@ h1 span.o-col { color: var(--o); }
 
 <div id="mode-modal">
   <div class="mode-box">
-    <h2>SELECT MODE</h2>
-    <p>CHOOSE YOUR GAME</p>
+    <h2>3D ULTIMATE TTT</h2>
+    <span class="choose-label">CHOOSE YOUR MODE</span>
     <div class="mode-options">
       <button class="mode-btn classic" onclick="startGame('classic')">
-        <span class="mode-name">CLASSIC</span>
-        <span class="mode-desc">3D META (27 boards) · 3D LOCAL (27 cells) · full cube</span>
+        <span class="mode-info">
+          <span class="mode-name">CLASSIC</span>
+          <span class="mode-desc">Full 3D — 27 boards on a 3D meta-grid · hardest · recommended</span>
+        </span>
       </button>
       <button class="mode-btn quick" onclick="startGame('quick')">
-        <span class="mode-name">QUICK PLAY</span>
-        <span class="mode-desc">2D META (9 boards) · 3D LOCAL (27 cells) · faster meta</span>
+        <span class="mode-info">
+          <span class="mode-name">QUICK PLAY</span>
+          <span class="mode-desc">9 boards on a flat grid · 3D local games · medium length</span>
+        </span>
       </button>
       <button class="mode-btn blitz" onclick="startGame('blitz')">
-        <span class="mode-name">BLITZ</span>
-        <span class="mode-desc">2D META (9 boards) · 2D LOCAL (9 cells) · fastest</span>
+        <span class="mode-info">
+          <span class="mode-name">BLITZ</span>
+          <span class="mode-desc">9 boards, 9 cells each · all 2D · fastest game</span>
+        </span>
       </button>
     </div>
     <div class="ai-setup">
-      <div class="ai-toggle-row">
-        <div class="ai-toggle-label">VS AI<span>single player mode</span></div>
-        <button class="toggle-switch" id="ai-toggle" onclick="toggleAI()"></button>
+      <div class="ai-option-label" style="margin-bottom:8px;">PLAYERS</div>
+      <div class="ai-btn-group">
+        <button class="ai-opt-btn selected" id="btn-pass-play" onclick="setPlayerMode('pass')">PASS &amp; PLAY</button>
+        <button class="ai-opt-btn" id="btn-vs-ai" onclick="setPlayerMode('ai')">VS AI</button>
       </div>
       <div class="ai-options" id="ai-options">
         <div class="ai-option-row">
@@ -635,10 +746,6 @@ h1 span.o-col { color: var(--o); }
             <button class="ai-opt-btn" id="diff-hard" onclick="setAIDiff('hard')">HARD</button>
           </div>
         </div>
-      </div>
-      <div class="ai-toggle-row" style="margin-top:4px;">
-        <div class="ai-toggle-label">SHARE &amp; PLAY<span>pass via link each turn</span></div>
-        <button class="toggle-switch" id="sp-toggle" onclick="toggleSharePlay()"></button>
       </div>
     </div>
   </div>
@@ -665,10 +772,6 @@ h1 span.o-col { color: var(--o); }
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CONSTANTS & WIN LINES
-// ═══════════════════════════════════════════════════════
-
 function li(z,y,x){ return z*9+y*3+x; }
 
 function buildWins3d(){
@@ -695,8 +798,37 @@ function buildWins2d(){
 const WINS3D = buildWins3d();
 const WINS2D = buildWins2d();
 
-let gameMode = 'classic';
+const META_LINE_COUNTS = (()=>{
+  const counts = Array(27).fill(0);
+  for(const [a,b,c] of WINS3D){ counts[a]++; counts[b]++; counts[c]++; }
+  return counts;
+})();
 
+const META_LINE_COUNTS_2D = (()=>{
+  const counts = Array(9).fill(0);
+  for(const [a,b,c] of WINS2D){ counts[a]++; counts[b]++; counts[c]++; }
+  return counts;
+})();
+
+const W = {
+  winMeta:              2578.65,
+  blockMetaWin:         1252.39,
+  winLocal:             69.68,
+  localBoardValueMult:  1.81,
+  blockLocalNear:       18.84,
+  oppNearAfterSend:     82.73,
+  sendToMyMetaLine:     116.35,
+  sendToTheirMetaLine:  103.75,
+  targetMetaLineCount:  3.33,
+  cellLocalLineCount:   0,
+  sendToBoardIDominate: 6.66,
+  noise:                0
+};
+
+const AI_LOOKAHEAD_DEPTH = 1;
+const AI_BEAM_WIDTH = 8;
+
+let gameMode = 'classic';
 let vsAI = false;
 let aiPlayer = 'o';
 let aiDifficulty = 'easy';
@@ -705,17 +837,15 @@ let sharePlay = false;
 let lastMoveMeta = null, lastMoveCell = null;
 let lastMoveCleared = false;
 
-function toggleAI(){
-  vsAI = !vsAI;
-  if(vsAI && sharePlay){ sharePlay = false; document.getElementById('sp-toggle').classList.remove('on'); }
-  document.getElementById('ai-toggle').classList.toggle('on', vsAI);
+function setPlayerMode(mode){
+  vsAI = (mode === 'ai');
+  sharePlay = false;
+  document.getElementById('btn-pass-play').classList.toggle('selected', !vsAI);
+  document.getElementById('btn-vs-ai').classList.toggle('selected', vsAI);
   document.getElementById('ai-options').classList.toggle('show', vsAI);
 }
-function toggleSharePlay(){
-  sharePlay = !sharePlay;
-  if(sharePlay && vsAI){ vsAI = false; document.getElementById('ai-toggle').classList.remove('on'); document.getElementById('ai-options').classList.remove('show'); }
-  document.getElementById('sp-toggle').classList.toggle('on', sharePlay);
-}
+function toggleAI(){ setPlayerMode(vsAI ? 'pass' : 'ai'); }
+function toggleSharePlay(){ sharePlay = false; }
 function setAIPlayerPick(p){
   aiPlayer = p === 'x' ? 'o' : 'x';
   document.getElementById('pick-x').classList.toggle('selected', p === 'x');
@@ -731,6 +861,7 @@ function metaSize(){ return gameMode === 'classic' ? 27 : 9; }
 function localSize(){ return gameMode === 'blitz' ? 9 : 27; }
 function metaWins(){ return gameMode === 'classic' ? WINS3D : WINS2D; }
 function localWins(){ return gameMode === 'blitz' ? WINS2D : WINS3D; }
+function metaLineCounts(){ return gameMode === 'classic' ? META_LINE_COUNTS : META_LINE_COUNTS_2D; }
 
 function cellToTarget(cellIdx){
   if(gameMode === 'classic') return cellIdx;
@@ -774,6 +905,24 @@ function checkWin(arr, wins){
 
 let pendingMeta = null, pendingCell = null;
 
+function updateHint(){
+  const hint = document.getElementById('hint-text');
+  if(!hint) return;
+  if(gameOver){ hint.innerHTML = 'Game over!'; return; }
+  if(pendingMeta !== null){
+    const p = currentPlayer.toUpperCase();
+    hint.innerHTML = `Confirm placing <strong>${p}</strong> — or cancel to pick a different cell`;
+    return;
+  }
+  if(navSelected !== null && isMetaActive(navSelected)){
+    hint.innerHTML = `Board selected — <span class="hl">click a cell</span> to place your piece, or pick a different board`;
+  } else if(navSelected !== null && !isMetaActive(navSelected)){
+    hint.innerHTML = `That board is <strong>not active</strong> this turn — pick a <span class="hl">glowing green board</span> in the center`;
+  } else {
+    hint.innerHTML = `Click a <span class="hl">glowing board</span> in the center to select it, then click a cell inside to play`;
+  }
+}
+
 function handleCellClick(metaIdx, cellIdx){
   if(gameOver) return;
   if(vsAI && currentPlayer === aiPlayer) return;
@@ -810,6 +959,7 @@ function showConfirmBar(){
   if(currentView === 'flat'){
     applyTargetHighlight(cellToTarget(pendingCell));
   }
+  updateHint();
 }
 
 function commitPreview(){
@@ -844,6 +994,7 @@ function commitPreview(){
   currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
   renderAll();
   updateStatus();
+  updateHint();
 
   if(vsAI && currentPlayer === aiPlayer && !gameOver){
     aiPending = true;
@@ -866,11 +1017,8 @@ function cancelPreview(silent){
   document.getElementById('confirm-bar').classList.remove('show');
   clearTargetHighlight();
   if(!silent) renderAll();
+  updateHint();
 }
-
-// ═══════════════════════════════════════════════════════
-// AI
-// ═══════════════════════════════════════════════════════
 
 function aiTakeTurn(){
   document.getElementById('ai-thinking').classList.remove('show');
@@ -910,14 +1058,6 @@ function countNearWins(cells, player, wins){
   return count;
 }
 
-function hasWinningMove(cells, player, wins){
-  for(const [a,b,c] of wins){
-    const vals = [cells[a], cells[b], cells[c]];
-    if(vals.filter(v=>v===player).length === 2 && vals.filter(v=>!v).length === 1) return true;
-  }
-  return false;
-}
-
 function wouldWinLocal(metaIdx, cellIdx, player){
   const cells = localCells[metaIdx].slice();
   cells[cellIdx] = player;
@@ -936,61 +1076,199 @@ function wouldWinMeta(metaIdx, player){
   return false;
 }
 
-const CENTER_3D = 13;
-const CENTER_2D = 4;
-const CORNERS_3D = [0,2,6,8,18,20,24,26];
-const CORNERS_2D = [0,2,6,8];
-
-function cellPositionScore(cellIdx){
-  if(gameMode === 'blitz'){
-    if(cellIdx === CENTER_2D) return 10;
-    if(CORNERS_2D.includes(cellIdx)) return 5;
-    return 1;
+function metaNearLines(mw, mi, player){
+  let n = 0;
+  for(const [a,b,c] of metaWins()){
+    if(![a,b,c].includes(mi)) continue;
+    if([a,b,c].filter(x=>x!==mi).every(x=>mw[x]===player)) n++;
   }
-  if(cellIdx === CENTER_3D) return 10;
-  if(CORNERS_3D.includes(cellIdx)) return 5;
-  return 1;
+  return n;
+}
+
+function applyMoveSnapshot(snap, metaIdx, cellIdx, player){
+  const lc = snap.localCells.map(a => a.slice());
+  const mw = snap.metaWinners.slice();
+  const lWins = snap.isBlitz ? WINS2D : WINS3D;
+  const mWins = snap.is2DMeta ? WINS2D : WINS3D;
+
+  lc[metaIdx][cellIdx] = player;
+
+  for(const [a,b,c] of lWins){
+    if(lc[metaIdx][a] && lc[metaIdx][a]===lc[metaIdx][b] && lc[metaIdx][a]===lc[metaIdx][c]){
+      mw[metaIdx] = lc[metaIdx][a]; break;
+    }
+  }
+  if(!mw[metaIdx] && lc[metaIdx].every(v=>v)) mw[metaIdx] = 'draw';
+
+  let metaWin = null;
+  for(const [a,b,c] of mWins){
+    if(mw[a] && mw[a]!=='draw' && mw[a]===mw[b] && mw[a]===mw[c]){ metaWin = mw[a]; break; }
+  }
+  if(!metaWin && mw.every(v=>v)) metaWin = 'draw';
+
+  const mSz = mw.length;
+  let tgt = snap.isQuick ? cellIdx % 9 : cellIdx;
+  let nextActive;
+  if(!mw[tgt]){
+    nextActive = [tgt];
+  } else {
+    nextActive = [...Array(mSz).keys()].filter(i=>!mw[i]);
+  }
+
+  return { ...snap, localCells: lc, metaWinners: mw, activeBoards: nextActive.length ? nextActive : null, metaWin };
+}
+
+function getLegalMovesFromSnap(snap){
+  const { localCells, metaWinners, activeBoards } = snap;
+  const mSz = metaWinners.length;
+  const lSz = localCells[0].length;
+  const moves = [];
+  for(let mi = 0; mi < mSz; mi++){
+    if(metaWinners[mi]) continue;
+    if(activeBoards !== null && !activeBoards.includes(mi)) continue;
+    for(let ci = 0; ci < lSz; ci++){
+      if(!localCells[mi][ci]) moves.push({metaIdx:mi, cellIdx:ci});
+    }
+  }
+  return moves;
+}
+
+function scoreMoveHeuristic(snap, metaIdx, cellIdx, player){
+  const { localCells, metaWinners } = snap;
+  const opp = player === 'x' ? 'o' : 'x';
+  const lWins = snap.isBlitz ? WINS2D : WINS3D;
+  const mWins = snap.is2DMeta ? WINS2D : WINS3D;
+  const mlc   = snap.is2DMeta ? META_LINE_COUNTS_2D : META_LINE_COUNTS;
+  let score = 0;
+
+  const tmpLocal = localCells[metaIdx].slice();
+  tmpLocal[cellIdx] = player;
+  let winsLocal = false;
+  for(const [a,b,c] of lWins){
+    if(tmpLocal[a]===player && tmpLocal[b]===player && tmpLocal[c]===player){ winsLocal=true; break; }
+  }
+
+  let winsMeta = false;
+  if(winsLocal){
+    const tmpMeta = metaWinners.slice(); tmpMeta[metaIdx] = player;
+    for(const [a,b,c] of mWins){
+      if(tmpMeta[a]===player && tmpMeta[b]===player && tmpMeta[c]===player){ winsMeta=true; break; }
+    }
+  }
+
+  let oppWouldWinMeta = false;
+  {
+    const tmpLocal2 = localCells[metaIdx].slice(); tmpLocal2[cellIdx] = opp;
+    let oppWinsLocal = false;
+    for(const [a,b,c] of lWins){
+      if(tmpLocal2[a]===opp && tmpLocal2[b]===opp && tmpLocal2[c]===opp){ oppWinsLocal=true; break; }
+    }
+    if(oppWinsLocal){
+      const tmpMeta2 = metaWinners.slice(); tmpMeta2[metaIdx] = opp;
+      for(const [a,b,c] of mWins){
+        if(tmpMeta2[a]===opp && tmpMeta2[b]===opp && tmpMeta2[c]===opp){ oppWouldWinMeta=true; break; }
+      }
+    }
+  }
+
+  const boardVal = mlc[metaIdx] * W.localBoardValueMult;
+
+  if(winsMeta)        score += W.winMeta;
+  if(oppWouldWinMeta) score += W.blockMetaWin;
+  if(winsLocal)       score += W.winLocal + boardVal;
+
+  const nearBefore = countNearWins(localCells[metaIdx], opp, lWins);
+  if(nearBefore > 0){
+    const tmp = localCells[metaIdx].slice(); tmp[cellIdx] = player;
+    const nearAfter = countNearWins(tmp, opp, lWins);
+    if(nearAfter < nearBefore) score += W.blockLocalNear * (nearBefore - nearAfter);
+  }
+
+  const tgt = snap.isQuick ? cellIdx % 9 : cellIdx;
+  if(tgt < metaWinners.length && !metaWinners[tgt]){
+    const oppNear = countNearWins(localCells[tgt], opp, lWins);
+    score -= W.oppNearAfterSend * oppNear;
+    score += W.targetMetaLineCount * mlc[tgt];
+
+    const theirLines = metaNearLines(metaWinners, tgt, opp);
+    const myLines    = metaNearLines(metaWinners, tgt, player);
+    score -= W.sendToTheirMetaLine * theirLines;
+    score += W.sendToMyMetaLine    * myLines;
+
+    const myPieces  = localCells[tgt].filter(x=>x===player).length;
+    const oppPieces = localCells[tgt].filter(x=>x===opp).length;
+    if(myPieces > oppPieces) score += W.sendToBoardIDominate;
+  }
+
+  return score;
+}
+
+function scoreMoveDeep(snap, metaIdx, cellIdx, player, depth){
+  const after = applyMoveSnapshot(snap, metaIdx, cellIdx, player);
+
+  if(after.metaWin){
+    if(after.metaWin === player) return  W.winMeta * 10;
+    if(after.metaWin === 'draw') return  0;
+    return -W.winMeta * 10;
+  }
+
+  if(depth === 0){
+    return scoreMoveHeuristic(snap, metaIdx, cellIdx, player);
+  }
+
+  const opp = player === 'x' ? 'o' : 'x';
+  const oppMoves = getLegalMovesFromSnap(after);
+  if(!oppMoves.length) return scoreMoveHeuristic(snap, metaIdx, cellIdx, player);
+
+  const oppScored = oppMoves.map(({metaIdx:mi, cellIdx:ci}) => ({
+    mi, ci, s: scoreMoveHeuristic(after, mi, ci, opp)
+  }));
+  oppScored.sort((a,b) => b.s - a.s);
+  const oppCandidates = oppScored.slice(0, AI_BEAM_WIDTH);
+
+  let worstForUs = Infinity;
+  for(const {mi, ci} of oppCandidates){
+    const oppScore = scoreMoveDeep(after, mi, ci, opp, depth - 1);
+    const ourPerspective = -oppScore;
+    if(ourPerspective < worstForUs) worstForUs = ourPerspective;
+  }
+
+  return worstForUs;
 }
 
 function aiPickHard(){
-  const me = aiPlayer;
-  const opp = me === 'x' ? 'o' : 'x';
+  const me  = aiPlayer;
   const moves = getLegalMoves();
   if(!moves.length) return null;
-  let best = null, bestScore = -Infinity;
-  for(const mv of moves){
-    const {metaIdx, cellIdx} = mv;
-    let score = 0;
-    const winsLocal = wouldWinLocal(metaIdx, cellIdx, me);
-    if(winsLocal && wouldWinMeta(metaIdx, me)) score += 1000;
-    if(wouldWinLocal(metaIdx, cellIdx, opp) && wouldWinMeta(metaIdx, opp)){
-      if(winsLocal && wouldWinMeta(metaIdx, me)) {}
-      else score += 500;
-    }
-    if(winsLocal) score += 100;
-    if(countNearWins(localCells[metaIdx], opp, localWins()) > 0 && !localCells[metaIdx][cellIdx]){
-      const tempCells = localCells[metaIdx].slice();
-      tempCells[cellIdx] = me;
-      const before = countNearWins(localCells[metaIdx], opp, localWins());
-      const after  = countNearWins(tempCells, opp, localWins());
-      if(after < before) score += 50 * (before - after);
-    }
-    const targetMi = cellToTarget(cellIdx);
-    if(!metaWinners[targetMi]){
-      const oppNear = countNearWins(localCells[targetMi], opp, localWins());
-      score -= oppNear * 40;
-      score += 15;
-    }
-    score += cellPositionScore(cellIdx);
-    score += Math.random() * 0.5;
-    if(score > bestScore){ bestScore = score; best = mv; }
-  }
-  return best;
-}
 
-// ═══════════════════════════════════════════════════════
-// STATE ENCODING / DECODING
-// ═══════════════════════════════════════════════════════
+  const snap = {
+    localCells:   localCells.map(a => a.slice()),
+    metaWinners:  metaWinners.slice(),
+    activeBoards: activeMetaBoards ? [...activeMetaBoards] : null,
+    isBlitz:      gameMode === 'blitz',
+    is2DMeta:     gameMode !== 'classic',
+    isQuick:      gameMode === 'quick'
+  };
+
+  const scored = moves.map(({metaIdx, cellIdx}) => ({
+    metaIdx, cellIdx,
+    s: scoreMoveHeuristic(snap, metaIdx, cellIdx, me)
+  }));
+  scored.sort((a,b) => b.s - a.s);
+
+  if(AI_LOOKAHEAD_DEPTH === 0){
+    return scored[0];
+  }
+
+  const candidates = scored.slice(0, AI_BEAM_WIDTH);
+  let best = null, bestScore = -Infinity;
+  for(const {metaIdx, cellIdx} of candidates){
+    const s = scoreMoveDeep(snap, metaIdx, cellIdx, me, AI_LOOKAHEAD_DEPTH);
+    if(s > bestScore){ bestScore = s; best = {metaIdx, cellIdx}; }
+  }
+
+  return best || scored[0];
+}
 
 function encodeCells(cells){
   const vals = cells.map(v => v === 'x' ? 1 : v === 'o' ? 2 : 0);
@@ -1098,26 +1376,17 @@ function decodeStateFromHash(){
   } catch(e){ return false; }
 }
 
-// ═══════════════════════════════════════════════════════
-// RESUME BANNER
-// ═══════════════════════════════════════════════════════
-
 function showResumeBanner(){
   const banner = document.getElementById('resume-banner');
   const modeNames = { classic:'CLASSIC', quick:'QUICK PLAY', blitz:'BLITZ' };
-  const prevPlayer = currentPlayer === 'x' ? 'O' : 'X'; // who just played
+  const prevPlayer = currentPlayer === 'x' ? 'O' : 'X';
   const prevPlayerColor = prevPlayer === 'X' ? '#e8ff57' : '#ff6b6b';
   banner.innerHTML = sharePlay
     ? `RESUMED · <strong style="color:${prevPlayerColor}">${prevPlayer}</strong> just moved · it's your turn as <strong style="color:${currentPlayer==='x'?'#e8ff57':'#ff6b6b'}">${currentPlayer.toUpperCase()}</strong>`
     : `GAME RESUMED · ${modeNames[gameMode]} · <strong style="color:${currentPlayer==='x'?'#e8ff57':'#ff6b6b'}">${currentPlayer.toUpperCase()}'S TURN</strong>`;
   banner.classList.add('show');
-  // Auto-hide after 5 seconds
   setTimeout(()=>{ banner.classList.remove('show'); }, 5000);
 }
-
-// ═══════════════════════════════════════════════════════
-// SHARE MODAL
-// ═══════════════════════════════════════════════════════
 
 function showShareModal(){
   const url = location.href;
@@ -1168,10 +1437,6 @@ function endGame(winner){
     sub.textContent = gameMode === 'classic' ? '3 meta-positions in a 3D line' : '3 meta-boards in a row';
   }
 }
-
-// ═══════════════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════════════
 
 let currentView = 'nav';
 
@@ -1421,13 +1686,17 @@ function renderNav(){
     const coordStr = gameMode === 'classic'
       ? `Z=${Math.floor(mi/9)} Y=${Math.floor((mi%9)/3)} X=${mi%3}`
       : `Y=${Math.floor(mi/3)} X=${mi%3}`;
-    leftLabel.innerHTML = `LOCAL  ${coordStr}<span>${isMetaActive(mi)?'your turn here':'not active'}</span>`;
+    const isActive = isMetaActive(mi);
+    leftLabel.className = 'nav-panel-label' + (isActive ? ' active-label' : '');
+    leftLabel.innerHTML = `<span class="label-main">BOARD ${coordStr}</span><span class="label-sub">${isActive ? 'click a cell to play here' : 'not your turn here'}</span>`;
     leftBoard.appendChild(buildNavBoard(mi, false));
   } else {
-    leftLabel.innerHTML = `SELECT A POSITION<span>to play here</span>`;
-    leftBoard.innerHTML = '<div class="nav-panel-empty">SELECT A META<br>POSITION</div>';
+    leftLabel.className = 'nav-panel-label active-label';
+    leftLabel.innerHTML = `<span class="label-main">YOUR BOARD</span><span class="label-sub">click a board from the center</span>`;
+    leftBoard.innerHTML = '<div class="nav-panel-empty">SELECT A BOARD<br>FROM THE CENTER</div>';
   }
   renderNavTarget();
+  updateHint();
 }
 
 function makeNavCell(mi, coordText){
@@ -1454,19 +1723,21 @@ function renderNavTarget(){
   rightBoard.className = '';
   const targetIdx = (pendingMeta !== null) ? cellToTarget(pendingCell) : navHoverTarget;
   if(targetIdx === null || targetIdx === undefined){
-    rightLabel.innerHTML = `OPPONENT SENT TO<span>hover a cell to preview</span>`;
+    rightLabel.className = 'nav-panel-label target-label';
+    rightLabel.innerHTML = `<span class="label-main">OPPONENT'S NEXT BOARD</span><span class="label-sub">hover a cell to preview</span>`;
     rightBoard.innerHTML = '<div class="nav-panel-empty">HOVER A CELL<br>TO PREVIEW</div>';
     return;
   }
   const isClaimed = !!metaWinners[targetIdx];
-  const lockedStr = pendingMeta !== null ? ' · LOCKED' : '';
+  const lockedStr = pendingMeta !== null ? ' · locked' : '';
   const coordStr = gameMode === 'classic'
     ? `Z=${Math.floor(targetIdx/9)} Y=${Math.floor((targetIdx%9)/3)} X=${targetIdx%3}`
     : `Y=${Math.floor(targetIdx/3)} X=${targetIdx%3}`;
+  rightLabel.className = 'nav-panel-label target-label';
   if(!isClaimed){
-    rightLabel.innerHTML = `OPPONENT SENT TO  ${coordStr}<span>${lockedStr}</span>`;
+    rightLabel.innerHTML = `<span class="label-main">SENDS TO ${coordStr}</span><span class="label-sub">opponent plays here next${lockedStr}</span>`;
   } else {
-    rightLabel.innerHTML = `CLAIMED — FREE CHOICE  ${coordStr}<span>opponent plays anywhere free</span>`;
+    rightLabel.innerHTML = `<span class="label-main">CLAIMED — FREE CHOICE</span><span class="label-sub">opponent picks any open board</span>`;
   }
   rightBoard.appendChild(buildNavBoard(targetIdx, true));
 }
@@ -1475,6 +1746,8 @@ let navHoverTarget = null;
 
 function updateStatus(){
   const lbl = document.getElementById('turn-label');
+  const pip = document.getElementById('turn-pip');
+  const ind = document.getElementById('turn-indicator');
   if(vsAI){
     const isAITurn = currentPlayer === aiPlayer;
     lbl.textContent = currentPlayer.toUpperCase() + (isAITurn ? ' · AI' : ' · YOU');
@@ -1482,10 +1755,13 @@ function updateStatus(){
     lbl.textContent = currentPlayer.toUpperCase() + "'S TURN";
   }
   lbl.style.color = currentPlayer === 'x' ? 'var(--x)' : 'var(--o)';
+  pip.className = currentPlayer === 'o' ? 'o' : '';
+  ind.className = currentPlayer === 'o' ? 'o-turn' : 'x-turn';
+
   const modeLbl = document.getElementById('mode-label');
   const modeNames = { classic:'CLASSIC · 3D×3D', quick:'QUICK · 2D×3D', blitz:'BLITZ · 2D×2D' };
   modeLbl.textContent = modeNames[gameMode];
-  const zLegend = document.querySelector('#statusbar > div:last-child');
+  const zLegend = document.getElementById('z-legend');
   if(zLegend) zLegend.style.display = gameMode === 'blitz' ? 'none' : 'flex';
   const prog = document.getElementById('meta-progress');
   prog.innerHTML = '';
@@ -1533,6 +1809,7 @@ function setView(v){
   currentView = v;
   document.getElementById('view-flat').style.display = v==='flat' ? 'flex' : 'none';
   document.getElementById('view-nav').style.display  = v==='nav'  ? 'flex' : 'none';
+  document.getElementById('hint-bar').style.display  = v==='nav'  ? 'block' : 'none';
   ['flat','nav'].forEach(n=>{
     const btn = document.getElementById('btn-'+n);
     if(btn) btn.classList.toggle('on', n===v);
@@ -1546,10 +1823,6 @@ function toggleRules(){
   document.getElementById('btn-rules').classList.toggle('on', r.classList.contains('show'));
 }
 
-// ═══════════════════════════════════════════════════════
-// MODE SELECTION & RESET
-// ═══════════════════════════════════════════════════════
-
 function startGame(mode){
   gameMode = mode;
   document.getElementById('mode-modal').classList.remove('show');
@@ -1557,6 +1830,7 @@ function startGame(mode){
   initState();
   applyToolbarForMode();
   renderAll();
+  updateHint();
   encodeStateToHash();
   if(vsAI && aiPlayer === 'x' && !gameOver){
     aiPending = true;
@@ -1574,17 +1848,18 @@ function applyToolbarForMode(){
     currentView = 'flat';
     document.getElementById('view-flat').style.display = 'flex';
     document.getElementById('view-nav').style.display = 'none';
+    document.getElementById('hint-bar').style.display = 'none';
     document.getElementById('btn-flat').classList.add('on');
     document.getElementById('btn-nav').classList.remove('on');
   } else {
     navBtn.style.display = '';
-    // Auto-select the last-played board in navigator for context
     if(lastMoveMeta !== null && !lastMoveCleared){
       navSelected = lastMoveMeta;
     }
     currentView = 'nav';
     document.getElementById('view-flat').style.display = 'none';
     document.getElementById('view-nav').style.display = 'flex';
+    document.getElementById('hint-bar').style.display = 'block';
     document.getElementById('btn-flat').classList.remove('on');
     document.getElementById('btn-nav').classList.add('on');
   }
@@ -1595,35 +1870,29 @@ function resetGame(){
   document.getElementById('win-modal').classList.remove('show');
   document.getElementById('resume-banner').classList.remove('show');
   vsAI = false; sharePlay = false;
-  document.getElementById('ai-toggle').classList.remove('on');
+  document.getElementById('btn-pass-play').classList.add('selected');
+  document.getElementById('btn-vs-ai').classList.remove('selected');
   document.getElementById('ai-options').classList.remove('show');
-  document.getElementById('sp-toggle').classList.remove('on');
   document.getElementById('mode-modal').classList.add('show');
 }
 
-// ═══════════════════════════════════════════════════════
-// INIT — restore from hash or show mode modal
-// ═══════════════════════════════════════════════════════
 (function init(){
   if(decodeStateFromHash()){
-    // Valid game state found in URL — resume immediately, no modal
     document.getElementById('mode-modal').classList.remove('show');
     applyToolbarForMode();
     renderAll();
     updateStatus();
-    // Show resume banner to orient the player
+    updateHint();
     showResumeBanner();
     if(gameOver){
       const gw = checkWin(metaWinners, metaWins());
       if(gw) endGame(gw);
     } else if(vsAI && currentPlayer === aiPlayer){
-      // If it's AI's turn on load (shouldn't normally happen in share-play but handle it)
       aiPending = true;
       document.getElementById('ai-thinking').classList.add('show');
       setTimeout(()=>{ aiTakeTurn(); }, 600);
     }
   } else {
-    // No valid state — show mode selection modal
     document.getElementById('mode-modal').classList.add('show');
   }
 })();

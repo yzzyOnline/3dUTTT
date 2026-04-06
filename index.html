@@ -390,31 +390,16 @@ h1 span.x-col { color: var(--x); } h1 span.o-col { color: var(--o); }
 .z-pill.z0 { color: var(--lz0-label); border-color: var(--lz0-border); background: #1a2a1a44; }
 .z-pill.z1 { color: var(--lz1-label); border-color: var(--lz1-border); background: #1a1a2e44; }
 .z-pill.z2 { color: var(--lz2-label); border-color: var(--lz2-border); background: #2e1a1a44; }
-
-/* NET BANNER */
-.net-banner {
-  display: none; width: 100%; max-width: 820px; margin-bottom: 12px;
-  padding: 12px 20px; border-radius: 6px;
-  text-align: center; font-size: 11px; letter-spacing: 0.12em; color: var(--text-hi);
-  animation: fadeIn 0.4s ease;
-}
-.net-banner.show  { display: block; }
-.net-banner.info  { background: #5566ff11; border: 1px solid var(--active); }
-.net-banner.error { background: #ff6b6b11; border: 1px solid var(--o); color: var(--o); }
-
-/* ONLINE MODE — hide the mode modal entirely when launched from lobby */
-body.online-mode #mode-modal { display: none !important; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1 onclick="document.getElementById('mode-modal').classList.add('show')" style="cursor:pointer;user-select:none" title="Back to menu"><span class="x-col">3D</span> ULTIMATE <span class="o-col">TTT</span></h1>
+  <h1><span class="x-col">3D</span> ULTIMATE <span class="o-col">TTT</span></h1>
   <div class="sub">tic-tac-toe · 3 dimensions · 27 boards · one cube to rule them all</div>
 </header>
 
 <div id="resume-banner"></div>
-<div id="net-banner" class="net-banner"></div>
 
 <div id="statusbar">
   <div id="turn-indicator" class="x-turn">
@@ -439,7 +424,6 @@ body.online-mode #mode-modal { display: none !important; }
   <button class="tbtn on" id="btn-nav" onclick="setView('nav')">NAVIGATOR</button>
   <button class="tbtn" id="btn-reset" onclick="resetGame()">RESET</button>
   <button class="tbtn" id="btn-share" onclick="shareState()" style="display:none">SHARE</button>
-  <button class="tbtn" id="btn-leave" onclick="onlineLeaveGame()" style="display:none">LEAVE GAME</button>
   <button class="tbtn" id="btn-rules" onclick="toggleRules()">RULES</button>
 </div>
 
@@ -493,13 +477,13 @@ body.online-mode #mode-modal { display: none !important; }
       <button class="mode-btn classic" onclick="startGame('classic')">
         <div class="mode-info">
           <span class="mode-name">CLASSIC</span>
-          <span class="mode-desc">Full 3D — 27 boards on a 3D meta-grid · hardest · longest</span>
+          <span class="mode-desc">Full 3D — 27 boards on a 3D meta-grid · hardest · recommended</span>
         </div>
       </button>
       <button class="mode-btn quick" onclick="startGame('quick')">
         <div class="mode-info">
           <span class="mode-name">QUICK PLAY</span>
-          <span class="mode-desc">9 boards on a flat grid · 3D local games · recommended</span>
+          <span class="mode-desc">9 boards on a flat grid · 3D local games · medium length</span>
         </div>
       </button>
       <button class="mode-btn blitz" onclick="startGame('blitz')">
@@ -532,11 +516,6 @@ body.online-mode #mode-modal { display: none !important; }
         </div>
       </div>
     </div>
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-      <button class="ai-opt-btn" style="width:100%;border-color:#44cc88;color:#44cc88;" onclick="goToLobby()">
-        ONLINE MULTIPLAYER · CREATE OR JOIN ROOM →
-      </button>
-    </div>
   </div>
 </div>
 
@@ -546,7 +525,6 @@ body.online-mode #mode-modal { display: none !important; }
     <p id="win-sub">3 meta-positions in a 3D line</p>
     <div class="win-btns">
       <button onclick="resetGame()">PLAY AGAIN</button>
-      <button id="btn-back-lobby" onclick="onlineLeaveGame()" style="display:none">BACK TO LOBBY</button>
       <button class="secondary" onclick="reviewBoard()">REVIEW BOARD</button>
     </div>
   </div>
@@ -564,68 +542,11 @@ body.online-mode #mode-modal { display: none !important; }
   </div>
 </div>
 
-<!-- Load order matters: state → ai → render → network → game -->
+<!-- Load order matters: state → ai → render → game -->
 <script src="state.js"></script>
 <script src="ai.js"></script>
 <script src="render.js"></script>
-<script type="module">
-  const { default: NetClient } = await import('./NetClient.js');
-  window.NetClient = NetClient;
-  // Mark body if launched from lobby
-  if (new URLSearchParams(location.search).get('online') === '1') {
-    document.body.classList.add('online-mode');
-  }
-  for (const src of ['names.js', 'network.js', 'game.js']) {
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = src; s.onload = res; s.onerror = rej;
-      document.body.appendChild(s);
-    });
-  }
-</script>
-
-<!-- Leave prompt — shown when clicking title during an online game -->
-<div id="leave-prompt" style="
-  display:none; position:fixed; inset:0;
-  background:rgba(10,10,15,0.92); backdrop-filter:blur(6px);
-  align-items:center; justify-content:center; z-index:700;
-">
-  <div style="
-    background:var(--panel); border:1px solid var(--border2);
-    border-radius:12px; padding:36px 44px 32px;
-    display:flex; flex-direction:column; gap:18px; align-items:center;
-    max-width:340px; width:92%; text-align:center;
-    font-family:'IBM Plex Mono',monospace;
-  ">
-    <div style="font-size:12px;letter-spacing:0.22em;color:var(--text);text-transform:uppercase;">Leave Game?</div>
-    <div style="font-size:13px;color:var(--text-hi);line-height:1.6;letter-spacing:0.03em;">You'll be disconnected and returned to the lobby.</div>
-    <div style="display:flex;gap:12px;width:100%;">
-      <button onclick="onlineLeaveGame();document.getElementById('leave-prompt').style.display='none';" style="
-        font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:800;
-        padding:12px; border-radius:7px; letter-spacing:0.14em; cursor:pointer;
-        flex:1; border:2px solid var(--x); background:#e8ff5710; color:var(--x);
-        transition:all 0.18s;
-      ">LEAVE</button>
-      <button onclick="document.getElementById('leave-prompt').style.display='none';" style="
-        font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:800;
-        padding:12px; border-radius:7px; letter-spacing:0.14em; cursor:pointer;
-        flex:1; border:2px solid var(--o); background:#ff6b6b10; color:var(--o);
-        transition:all 0.18s;
-      ">CANCEL</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// Override the inline onclick for online sessions
-document.querySelector('h1').addEventListener('click', function(e) {
-  if (typeof netIsOnline === 'function' && netIsOnline()) {
-    e.stopImmediatePropagation();
-    document.getElementById('leave-prompt').style.display = 'flex';
-  }
-  // else the inline onclick already showed the mode modal
-});
-</script>
+<script src="game.js"></script>
 
 </body>
 </html>

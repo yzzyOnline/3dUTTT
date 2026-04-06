@@ -1,9 +1,9 @@
 // ── GAME.JS ── flow control, event handlers, modals, AI trigger
-// Depends on: state.js, render.js, ai.js
+// Depends on: state.js, render.js, ai.js, network.js
 
-// ── CELL CLICK / CONFIRM FLOW ─────────────────────────────────────────────────
 function handleCellClick(metaIdx, cellIdx) {
   if (S.gameOver) return;
+  if (netIsOnline() && S.currentPlayer !== netMySymbol()) return;
   if (S.vsAI && S.currentPlayer === S.aiPlayer) return;
   if (S.aiPending) return;
   if (!isMetaActive(metaIdx)) return;
@@ -15,7 +15,6 @@ function handleCellClick(metaIdx, cellIdx) {
     renderAll();
   }
 
-  // Double-click the same pending cell = instant confirm
   if (S.pendingMeta === metaIdx && S.pendingCell === cellIdx) {
     commitPreview(); return;
   }
@@ -36,6 +35,8 @@ function commitPreview() {
   document.getElementById('confirm-bar').classList.remove('show');
   clearTargetHighlight();
 
+  if (netIsOnline()) netSendMove(metaIdx, cellIdx);
+
   const winner = applyMove(metaIdx, cellIdx);
   renderAll();
   updateHint();
@@ -51,9 +52,7 @@ function commitPreview() {
     return;
   }
 
-  if (S.sharePlay && !S.gameOver) {
-    showShareModal();
-  }
+  if (S.sharePlay && !S.gameOver) showShareModal();
 }
 
 function cancelPreview(silent) {
@@ -65,7 +64,6 @@ function cancelPreview(silent) {
   updateHint();
 }
 
-// ── AI TRIGGER ────────────────────────────────────────────────────────────────
 function aiTakeTurn() {
   document.getElementById('ai-thinking').classList.remove('show');
   S.aiPending = false;
@@ -77,7 +75,6 @@ function aiTakeTurn() {
   commitPreview();
 }
 
-// ── GAME LIFECYCLE ────────────────────────────────────────────────────────────
 function startGame(mode) {
   S.gameMode = mode;
   document.getElementById('mode-modal').classList.remove('show');
@@ -95,9 +92,11 @@ function startGame(mode) {
 }
 
 function resetGame() {
+  if (netIsOnline()) { onlineLeaveGame(); return; }
   history.replaceState(null, '', location.pathname + location.search);
   document.getElementById('win-modal').classList.remove('show');
   document.getElementById('resume-banner').classList.remove('show');
+  document.getElementById('net-banner')?.classList.remove('show');
   S.vsAI = false; S.sharePlay = false;
   document.getElementById('btn-pass-play').classList.add('selected');
   document.getElementById('btn-vs-ai').classList.remove('selected');
@@ -116,18 +115,23 @@ function endGame(winner) {
   const sub   = document.getElementById('win-sub');
   modal.classList.add('show');
   if (winner === 'draw') {
-    title.className   = 'draw'; title.textContent = 'DRAW!';
-    sub.textContent   = 'The meta is fully contested';
+    title.className = 'draw'; title.textContent = 'DRAW!';
+    sub.textContent = 'The meta is fully contested';
   } else {
-    title.className   = winner;
+    title.className = winner;
     title.textContent = winner.toUpperCase() + ' WINS!';
-    sub.textContent   = S.gameMode === 'classic' ? '3 meta-positions in a 3D line' : '3 meta-boards in a row';
+    sub.textContent = S.gameMode === 'classic' ? '3 meta-positions in a 3D line' : '3 meta-boards in a row';
   }
+  const lobbyBtn = document.getElementById('btn-back-lobby');
+  if (lobbyBtn) lobbyBtn.style.display = netIsOnline() ? '' : 'none';
+  const playAgainBtn = modal.querySelector('.win-btns button:first-child');
+  if (playAgainBtn && netIsOnline()) playAgainBtn.style.display = 'none';
 }
 
 function applyToolbarForMode() {
   document.getElementById('btn-reset').style.display = S.sharePlay ? 'none' : '';
-  document.getElementById('btn-share').style.display = S.sharePlay ? ''     : 'none';
+  document.getElementById('btn-share').style.display = S.sharePlay ? '' : 'none';
+  document.getElementById('btn-leave').style.display = 'none';
   const navBtn = document.getElementById('btn-nav');
   if (S.gameMode === 'blitz') {
     navBtn.style.display = 'none';
@@ -149,7 +153,6 @@ function applyToolbarForMode() {
   }
 }
 
-// ── MODE MODAL CONTROLS ───────────────────────────────────────────────────────
 function setPlayerMode(mode) {
   S.vsAI = (mode === 'ai');
   S.sharePlay = false;
@@ -170,17 +173,20 @@ function setAIDiff(d) {
   document.getElementById('diff-hard').classList.toggle('selected', d === 'hard');
 }
 
-// ── SHARE / URL ────────────────────────────────────────────────────────────────
+function goToLobby() {
+  location.href = 'lobby.html';
+}
+
 function shareState() {
   encodeStateToHash();
   showShareModal();
 }
 
 function showShareModal() {
-  document.getElementById('share-url').textContent          = location.href;
-  document.getElementById('share-next-player').textContent  = S.currentPlayer.toUpperCase();
-  document.getElementById('share-title').textContent        = 'YOUR MOVE IS DONE';
-  document.getElementById('btn-copy-url').textContent       = 'COPY LINK';
+  document.getElementById('share-url').textContent         = location.href;
+  document.getElementById('share-next-player').textContent = S.currentPlayer.toUpperCase();
+  document.getElementById('share-title').textContent       = 'YOUR MOVE IS DONE';
+  document.getElementById('btn-copy-url').textContent      = 'COPY LINK';
   document.getElementById('btn-copy-url').classList.remove('copied');
   document.getElementById('share-modal').classList.add('show');
 }
@@ -208,10 +214,9 @@ function toggleRules() {
   document.getElementById('btn-rules').classList.toggle('on', r.classList.contains('show'));
 }
 
-// ── RESUME BANNER ─────────────────────────────────────────────────────────────
 function showResumeBanner() {
   const banner = document.getElementById('resume-banner');
-  const modeNames  = { classic: 'CLASSIC', quick: 'QUICK PLAY', blitz: 'BLITZ' };
+  const modeNames = { classic: 'CLASSIC', quick: 'QUICK PLAY', blitz: 'BLITZ' };
   const prevPlayer = S.currentPlayer === 'x' ? 'O' : 'X';
   const prevColor  = prevPlayer === 'X' ? '#e8ff57' : '#ff6b6b';
   const curColor   = S.currentPlayer === 'x' ? '#e8ff57' : '#ff6b6b';
@@ -219,11 +224,13 @@ function showResumeBanner() {
     ? `RESUMED · <strong style="color:${prevColor}">${prevPlayer}</strong> just moved · it's your turn as <strong style="color:${curColor}">${S.currentPlayer.toUpperCase()}</strong>`
     : `GAME RESUMED · ${modeNames[S.gameMode]} · <strong style="color:${curColor}">${S.currentPlayer.toUpperCase()}'S TURN</strong>`;
   banner.classList.add('show');
-  setTimeout(() => { banner.classList.remove('show'); }, 5000);
+  setTimeout(() => banner.classList.remove('show'), 5000);
 }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
 (function init() {
+  if (new URLSearchParams(location.search).get('online') === '1') {
+    if (netInit()) return;
+  }
   if (decodeStateFromHash()) {
     document.getElementById('mode-modal').classList.remove('show');
     applyToolbarForMode();
